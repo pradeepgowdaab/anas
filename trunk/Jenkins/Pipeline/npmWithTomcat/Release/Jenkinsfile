@@ -74,13 +74,9 @@ node ('jenkins-slave-01') {
     }
     stage ('Software Binaries Repo') {
       stage = "Software Binaries Repo"
-withCredentials([usernamePassword(credentialsId: 'artifactoryId', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
 sh '''
-cd /opt/jenkins/workspace/Proj_QA_TrinityIoT-OpsAdmin_pipe_Build_Release/dist/
-tar -cvzf IoTOpsApps.tar.gz IoTOpsApps
-curl -v -u $USERNAME:$PASSWORD --upload-file IoTOpsApps.tar.gz http://test.trinityiot.in:8081/repository/trinityIoTPlatform-Product/QA/Release/trinityIOTOps/"$(date +"%d-%m-%Y")"/IoTOpsApps.tar.gz
-curl -v -u $USERNAME:$PASSWORD --upload-file IoTOpsApps.tar.gz http://test.trinityiot.in:8081/repository/trinityIoTPlatform-Product/QA/latest/trinityIOTOps/IoTOpsApps.tar.gz
-'''
+python /opt/Pipelines/Platform/product/Client/relase.py $Pro_Build $Module $Artifact_Product $Artifact_Product /dist/
+sh '''
 }
 }
     currentBuild.result = 'SUCCESS'
