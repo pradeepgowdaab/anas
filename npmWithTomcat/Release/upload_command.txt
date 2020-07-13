@@ -1,4 +1,0 @@
-//      sh '''
-// /usr/bin/python /opt/Pipelines/iccc/IoTOps/Client/relase.py $Pro_Build $Module $Artifact_Product $Artifact_Product $dist
-// /usr/bin/python /opt/Pipelines/iccc/IoTOps/Client/relase1.py $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url $dist
-//'''
