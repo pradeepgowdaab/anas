@@ -13,25 +13,25 @@ node ('jenkins-slave-01') {
       ignoreDirPropChanges: false,
       includedRegions: '',
       locations: [[cancelProcessOnExternalsFail: true, 
-        credentialsId: "$SCM_Cred_ID", 
-        depthOption: 'infinity', 
-        ignoreExternalsOption: true, 
-        local: '.', 
-        remote: '$SCM_checkout']], 
+      credentialsId: "$SCM_Cred_ID", 
+      depthOption: 'infinity', 
+      ignoreExternalsOption: true, 
+      local: '.', 
+      remote: '$SCM_checkout']], 
       quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
     }
 	//stage ('Code Coverage') {
-    //  stage = "Code Coverage"
-    //  sh '''
-	//  npm i
-    //  '''
-   //   }
+    // stage = "Code Coverage"
+    // h '''
+	//npm i
+    //'''
+   // }
  // stage ('UnitTest') {
-  //    stage = "UnitTest"
-  //    sh '''
- //	  npm i
-  //    ''' 
-   //  }
+  //stage = "UnitTest"
+  //sh '''
+ //npm i
+  // ''' 
+   //}
     stage('StaticAnalysis') {
      stage = "StaticAnalysis"
     withSonarQubeEnv('sonar') {
@@ -43,11 +43,12 @@ node ('jenkins-slave-01') {
   //stage("Quality Gate"){
   //stage = "Quality Gate"
   //timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-   // def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-   // echo "qg"
+   //def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+   //echo "qg"
 	//if (qg.status != 'OK') {
      // error "Pipeline aborted due to quality gate failure: ${qg.status}"
     //}
+  //}
   //}
     stage ('Package') {
       stage = "Package"
@@ -72,12 +73,12 @@ node ('jenkins-slave-01') {
 ///usr/bin/python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
 //"""
     //}
-    stage ('Software Binaries Repo') {
-      stage = "Software Binaries Repo"
-sh '''
-python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest /dist/
-sh '''
-}
+      stage ('Software Binaries Repo') {
+        stage = "Software Binaries Repo"
+        sh '''
+        python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest /dist/
+        sh '''
+  }
 }
     currentBuild.result = 'SUCCESS'
   }
@@ -86,8 +87,8 @@ finally {
     stage ('Report To JIRA')
 {
       sh """
-python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" "${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
-"""
+      python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" "${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
+      """
 }
     stage ('Send Email') {
       emailext (
