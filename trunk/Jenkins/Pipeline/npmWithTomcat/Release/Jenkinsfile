@@ -57,25 +57,25 @@ node ('jenkins-slave-01') {
 	  '''
     }
 
-    stage ('Deploy to QA') {
-     sh '''
-  /usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e ansiblehosts="${ansiblehosts}" -e win_service="${win_service}" -e   src="${src}" -e dest="${dest}"
-     '''  
-    }
-    stage ('SanityTesting') {
-      stage = "SanityTesting"
-      build "$Sanity"
-    }
-    stage ('OWASP top10 SecVal') {
-      stage = "OWASP top10 SecVal"
-      sh """
-/usr/bin/python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
-"""
-    }
+    //stage ('Deploy to QA') {
+     //sh '''
+  ///usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e ansiblehosts="${ansiblehosts}" -e win_service="${win_service}" -e   src="${src}" -e dest="${dest}"
+     //'''  
+    //}
+    //stage ('SanityTesting') {
+      //stage = "SanityTesting"
+      //build "$Sanity"
+    //}
+    //stage ('OWASP top10 SecVal') {
+      //stage = "OWASP top10 SecVal"
+      //sh """
+///usr/bin/python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
+//"""
+    //}
     stage ('Software Binaries Repo') {
       stage = "Software Binaries Repo"
 sh '''
-python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product /dist/
+python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest /dist/
 sh '''
 }
 }
