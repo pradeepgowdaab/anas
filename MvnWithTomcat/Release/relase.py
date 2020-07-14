@@ -12,6 +12,8 @@ if __name__ == "__main__":
     module = sys.argv[2]
     release = sys.argv[3]
     latest = sys.argv[4]
+	nexusurl = sys.argv[5]
+	productRepo = sys.argv[6]
     tree = et.ElementTree()
     tree.parse("/opt/jenkins/workspace/" + filename + "/pom.xml")
 
@@ -43,13 +45,13 @@ if __name__ == "__main__":
     group_name = group.replace(".", "/")
     if path.isfile(build_path1):
         print build_path1
-        url = "http://192.168.1.143:8081/repository/trinityICCC-Product/QA/release/"+release+"/"+module+"/"+artifact+"/"+version+"/"+artifact+"."+package
+        url = "http://"+nexusurl+"/repository/"+productRepo+"/QA/release/"+release+"/"+module+"/"+artifact+"/"+version+"/"+artifact+"."+package
         response = requests.put(url, auth=HTTPBasicAuth('admin', 'TrInItY123'), data=open(build_path1,'r').read())
-        url2 = "http://192.168.1.143:8081/repository/trinityICCC-Product/QA/latest/"+latest+"/"+module+"/"+artifact+"."+package
+        url2 = "http://"+nexusurl+"/repository/"+productRepo+"/QA/latest/"+latest+"/"+module+"/"+artifact+"."+package
         response2 = requests.put(url2, auth=HTTPBasicAuth('admin', 'TrInItY123'), data=open(build_path1,'r').read())
     elif path.isfile(build_path2):
         print build_path2
-        url = "http://192.168.1.143:8081/repository/trinityICCC-Product/QA/release/"+release+"/"+module+"/"+artifact+"/"+version+"/"+artifact+"."+package
+        url = "http://"+nexusurl+"/repository/"+productRepo+"/QA/release/"+release+"/"+module+"/"+artifact+"/"+version+"/"+artifact+"."+package
         response = requests.put(url, auth=HTTPBasicAuth('admin', 'TrInItY123'), data=open(build_path2,'r').read())
-        url2 = "http://192.168.1.143:8081/repository/trinityICCC-Product/QA/latest/"+latest+"/"+module+"/"+artifact+"."+package
+        url2 = "http://"+nexusurl+"/repository/"+productRepo+"/QA/latest/"+latest+"/"+module+"/"+artifact+"."+package
         response2 = requests.put(url2, auth=HTTPBasicAuth('admin', 'TrInItY123'), data=open(build_path2,'r').read())
