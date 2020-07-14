@@ -75,7 +75,7 @@ python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}"
     stage ('Software Binaries Repo') {
       stage = "Software Binaries Repo"
       sh '''
-/usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product
+/usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexusurl $productRepo
 '''
     }
     currentBuild.result = 'SUCCESS'
