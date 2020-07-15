@@ -100,7 +100,7 @@ node ('jenkins-slave-01') {
 
         stage = "Package"
 
-         sh 'mvn clean install -DskipTests=false'
+         sh 'mvn clean install -DskipTests'
 
         }
 
