@@ -96,13 +96,13 @@ node ('jenkins-slave-01') {
      //}
  //} 
 
-      stage ('Package') {
+      //stage ('Package'){
 
-        stage = "Package"
+        //stage = "Package"
 
          //sh 'mvn clean install -DskipTests=true'
 
-        }
+        //}
 
     //stage ('Deploy to QA') {
 
