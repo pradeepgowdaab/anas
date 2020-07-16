@@ -152,7 +152,7 @@ node ('jenkins-slave-01') {
 
       sh '''
 
-      /usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product  $nexus_url_release $nexus_url_latest
+      /usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest
 
       '''
 
