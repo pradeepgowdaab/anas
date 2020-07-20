@@ -1,218 +1,99 @@
-//BACKEND WAR   CODE  COMMON   
- 
 node ('jenkins-slave-01') {
-
-  try {
-
+  //try {
     stage ('Code Checkout') {
-
       stage = "Code Checkout"
-
       checkout([
-
       $class: 'SubversionSCM',
-
       additionalCredentials: [],
-
       excludedCommitMessages: '',
-
       excludedRegions: '',
-
       excludedRevprop: '',
-
       excludedUsers: '',
-
       filterChangelog: false,
-
       ignoreDirPropChanges: false,
-
       includedRegions: '',
-
-      locations: [[cancelProcessOnExternalsFail: true,
-
-        credentialsId: "$SCM_Cred_ID",
-
-        depthOption: 'infinity',
-
-        ignoreExternalsOption: true,
-
-        local: '.',
-
-        remote: '$SCM_checkout']],
-
+      locations: [[cancelProcessOnExternalsFail: true, 
+        credentialsId: "$SCM_Cred_ID", 
+        depthOption: 'infinity', 
+        ignoreExternalsOption: true, 
+        local: '.', 
+        remote: '$SCM_checkout']], 
       quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
-
     }
-
- 
-// stage ('Code Coverage'){
-
+	
+  //stage ('Code Coverage') {
    //   stage = "Code Coverage"
-
-    //  sh 'mvn clean verify'
-
-     //}
-
-  //stage ('UnitTest'){
-
-   //   stage = "UnitTest"
-
-    //  sh 'mvn test -DICCC_Config_SSO="$ICCC_Config_SSO" -DXVaultToken="$XVaultToken"'
-
-    //}
-
-    stage('StaticAnalysis') {
-
-                stage = "StaticAnalysis"
-
-     withSonarQubeEnv('sonar') {
-
-       sh 'mvn clean package sonar:sonar -DskipTests=true -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'
-
-    } // submitted SonarQube taskId is automatically attached to the pipeline context
-
-  }
-
- 
-
+    //  sh 'mvn clean verify -DICCC_Config_SSO="$ICCC_Config_SSO" -DXVaultToken="$XVaultToken"'
+     //                    }
+  //stage ('UnitTest') {
+  //   stage = "UnitTest"
+  //   sh 'mvn test -DICCC_Config_SSO="$ICCC_Config_SSO" -DXVaultToken="$XVaultToken"'
+  // }
+  //  stage('StaticAnalysis') {
+//	 stage = "StaticAnalysis"
+   // withSonarQubeEnv('sonar') {
+  //    sh 'mvn clean package sonar:sonar -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml' 
+  //  } // submitted SonarQube taskId is automatically attached to the pipeline context
+ // }
+  
   // No need to occupy a node
-
   //stage("Quality Gate"){
-
   //stage = "Quality Gate"
-
   //timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-
    // def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-
    // echo "qg"
-
-                //if (qg.status != 'OK') {
-
+	//if (qg.status != 'OK') {
      // error "Pipeline aborted due to quality gate failure: ${qg.status}"
-
-        //}
-
-     //}
- //} 
-
-      stage ('Package'){
-
-        stage = "Package"
-
-         sh 'mvn clean install -DskipTests=true'  
-
-        }
+    //}
+  //}
+    stage ('Package') {
+      stage = "Package"
+      sh 'mvn clean package -DskipTests=true'
+    }
 
     //stage ('Deploy to QA') {
-
      // stage = "Deploy to QA"
-
-     // deploy adapters: [tomcat8(credentialsId: '3b02c559-f55d-4b52-b64a-00cee06bac9b',
-
-      //path: '',
-
-      //url: "$Tomcat_dep")],
-
-      //contextPath: null,
-
+     // deploy adapters: [tomcat8(credentialsId: '3b02c559-f55d-4b52-b64a-00cee06bac9b', 
+      //path: '', 
+      //url: "$Tomcat_dep")], 
+      //contextPath: null, 
       //war: '**/*.war'
-
     //}
-
     //stage ('SanityTesting') {
-
     //  stage = "SanityTesting"
-
     //  build "$Sanity"
-
     //}
-
-//            //sleep 120
-
-//stage ('OWASP top10 SecVal') {
-
-//stage = "OWASP top10 SecVal"
-
-//sh """
-
-//mvn  -DzapPort=$zapPort -DappUserId=$appUserId -DappPassword=$appPassword -Djvm=$jvm -DzapPath=$zapPath -DtargetUrl=$targetUrl  -DappContext=$appContext -DloginUrl=$loginUrl  br.com.softplan.security.zap:zap-maven-plugin:analyze
-
-                 
-
-//python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
-
+    //stage ('OWASP top10 SecVal') {
+    // stage = "OWASP top10 SecVal"
+    //  sh """
+//python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  //"$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
 //"""
-
-//}
-
-   stage ('Software Binaries Repo') {
-
-    stage = "Software Binaries Repo"
-
+//    }
+    stage ('Software Binaries Repo') {
+      stage = "Software Binaries Repo"
       sh '''
-
-      /usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest
-
-      '''
-
-   }
-  
-  
- // stage ('Deploy to artifactory') {
-   //stage ="Deploy_to_artifactory"
-   //sh '''
-   //cd  /opt/jenkins/workspace/Proj_QA_TrinityWorkforce_TrackIntegration_Build_pipe_release/target
-
-   //curl -v -u admin:TrInItY123 --upload-file TrackIntegration.war http://test.trinityiot.in:8081/repository/trinityIoTPlatform-Product/QA/Release/trinityMOBILE/"$(date +"%d-%m-%Y")"/TrackIntegration.war
-   //curl -v -u admin:TrInItY123 --upload-file TrackIntegration.war http://test.trinityiot.in:8081/repository/trinityIoTPlatform-Product/QA/latest/trinityMOBILE/TrackIntegration.war
-   //'''
-//}
-
-      currentBuild.result = 'SUCCESS'
-
-  }
-
-    catch (err) { currentBuild.result = 'FAILURE' }
-
-finally {
-
-    stage ('Report To JIRA')
-
-{
-
-      sh """
-
-      python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" "${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
-
-       """
-
-}
-
-    stage ('Send Email') {
-
-                ws ("${Target}"){
-
-      emailext (
-
-        attachmentsPattern: '**/*.html',
-
-        subject: "Status of IOTHUB-DevSecOps pipeline: ${currentBuild.fullDisplayName}& ${stage}",
-
-        body: """${env.BUILD_URL} has result ${currentBuild.result} & at pipeline stage "${stage}" And Application url: ${Application_url} and sonarQube Url:${Sonarqube_url} \n\n\n\n  \n\nNote:This is an autogenerated mail.\nIn case of any clarification Please check with bhargava.t@trinitymobility.com or anas@trinitymobility.com""",
-
-        to: 'bhargava.t@trinitymobility.com,anilkumar@trinitymobility.com,veera@trinitymobility.com,anas@trinitymobility.com,sabjan.p@trinitymobility.com,narasimhamurthy.tn@trinitymobility.com,mahidhar@trinitymobility.com,bharanidharan@trinitymobility.com' )
-
+/usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest
+'''
     }
-
-                }
-
-// stage ('cleanws'){
-
-//   cleanWs()
-
-//}  
-
-}
-
+  //  currentBuild.result = 'SUCCESS'
+  //}
+  //  catch (err) { currentBuild.result = 'FAILURE' }
+//finally {
+ //   stage ('Report To JIRA')
+//{
+ //     sh """
+//python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" //"${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
+//"""
+//}
+    //stage ('Send Email') {
+    //  emailext (
+    //    subject: "Status of ICCC-DevSecOps pipeline: ${currentBuild.fullDisplayName}& ${stage}",
+    //    body: """${env.BUILD_URL} has result ${currentBuild.result} & at pipeline stage "${stage}" And Application url: //${Application_url} and sonarQube Url:${Sonarqube_url} \n\n\n\n  \n\nNote:This is an autogenerated mail.\nIn case of any //clarification Please check with bhargava.t@trinitymobility.com or anas@trinitymobility.com""",
+     //   to: //'bhargava.t@trinitymobility.com,anilkumar@trinitymobility.com,veera@trinitymobility.com,anas@trinitymobility.com,sabjan.p//@trinitymobility.com,narasimhamurthy.tn@trinitymobility.com,mahidhar@trinitymobility.com' )
+   // }
+ stage ('cleanws'){
+   cleanWs() 
+}   
+//}
+//}
 }
