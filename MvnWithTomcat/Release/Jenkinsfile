@@ -47,6 +47,8 @@ node ('jenkins-slave-01') {
     //}
   //}
   //}
+  
+  
     stage ('Package') {
       stage = "Package"
       sh 'mvn clean package -DskipTests=true'
