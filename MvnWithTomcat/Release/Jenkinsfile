@@ -23,11 +23,11 @@ node ('jenkins-slave-01') {
 	
      stage ('Code Coverage') {
         stage = "Code Coverage"
-        sh 'mvn clean verify -DICCC_Config_SSO="$ICCC_Config_SSO" -DXVaultToken="$XVaultToken"'
+       sh 'mvn clean verify $Junit_config $DXVaultToken'
                          }
      stage ('UnitTest') {
       stage = "UnitTest"
-      sh 'mvn test -DICCC_Config_SSO="$ICCC_Config_SSO" -DXVaultToken="$XVaultToken"'
+      sh 'mvn test verify $Junit_config $DXVaultToken'
     }
 	
 	
