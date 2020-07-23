@@ -21,15 +21,15 @@ node ('jenkins-slave-01') {
       quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
     }
 	
-        //stage ('Code Coverage') {
-        //stage = "Code Coverage"
-        //sh 'mvn clean verify $Junit_config $DXVaultToken'
-      //}
+        stage ('Code Coverage') {
+        stage = "Code Coverage"
+        sh 'mvn clean verify $Junit_config $DXVaultToken'
+      }
 	  
-      //stage ('UnitTest') {
-      //stage = "UnitTest"
-      //sh 'mvn test verify $Junit_config $DXVaultToken'
-    //}
+       stage ('UnitTest') {
+        stage = "UnitTest"
+        sh 'mvn test verify $Junit_config $DXVaultToken'
+      }
 	
     stage('StaticAnalysis') {
 	 stage = "StaticAnalysis"
