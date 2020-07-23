@@ -1,103 +1,156 @@
 node ('jenkins-slave-01') {
+
   try {
+
     stage ('Code Checkout') {
+
       stage = "Code Checkout"
+
       checkout([
+
       $class: 'SubversionSCM',
+
       additionalCredentials: [],
+
       excludedCommitMessages: '',
+
       excludedRegions: '',
+
       excludedRevprop: '',
+
       excludedUsers: '',
+
       filterChangelog: false,
+
       ignoreDirPropChanges: false,
+
       includedRegions: '',
-      locations: [[cancelProcessOnExternalsFail: true, 
-        credentialsId: "$SCM_Cred_ID", 
-        depthOption: 'infinity', 
-        ignoreExternalsOption: true, 
-        local: '.', 
-        remote: '$SCM_checkout']], 
+
+      locations: [[cancelProcessOnExternalsFail: true,
+
+        credentialsId: "$SCM_Cred_ID",
+
+        depthOption: 'infinity',
+
+        ignoreExternalsOption: true,
+
+        local: '.',
+
+        remote: '$SCM_checkout']],
+
       quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+
     }
-	
-     stage ('Code Coverage') {
+
+       stage ('Code Coverage') {
         stage = "Code Coverage"
        sh 'mvn clean verify $Junit_config $DXVaultToken'
-                         }
-     stage ('UnitTest') {
+        }
+				
+		
+      stage ('UnitTest') {
       stage = "UnitTest"
       sh 'mvn test verify $Junit_config $DXVaultToken'
-    }
-	
-	
-    stage('StaticAnalysis') {
-	 stage = "StaticAnalysis"
-    withSonarQubeEnv('sonar') {
-      sh 'mvn clean package sonar:sonar -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml' 
+       }  
+
+      stage('StaticAnalysis') {
+
+      stage = "StaticAnalysis"
+
+      withSonarQubeEnv('sonar') {
+
+     sh 'mvn sonar:sonar -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'
+
     } // submitted SonarQube taskId is automatically attached to the pipeline context
-  }
-  
+
+  } 
+
+ 
+
   // No need to occupy a node
+
   //stage("Quality Gate"){
+
   //stage = "Quality Gate"
+
   //timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+
    // def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+
    // echo "qg"
-	//if (qg.status != 'OK') {
+
+                //if (qg.status != 'OK') {
+
      // error "Pipeline aborted due to quality gate failure: ${qg.status}"
+
     //}
+
   //}
-    stage ('Package') {
+
+       stage ('Package') {
       stage = "Package"
-      sh 'mvn clean package -DskipTests=true'
+      sh 'mvn clean install -DskipTests=true'
     }
 
     //stage ('Deploy to QA') {
-     //stage = "Deploy to QA"
-     //deploy adapters: [tomcat8(credentialsId: '3b02c559-f55d-4b52-b64a-00cee06bac9b', 
-      //path: '', 
-      //url: "$Tomcat_dep")], 
-      //contextPath: null, 
+
+     // stage = "Deploy to QA"
+
+     // deploy adapters: [tomcat8(credentialsId: '3b02c559-f55d-4b52-b64a-00cee06bac9b',
+
+      //path: '',
+
+      //url: "$Tomcat_dep")],
+
+      //contextPath: null,
+
       //war: '**/*.war'
+
     //}
+
     //stage ('SanityTesting') {
+
     //  stage = "SanityTesting"
+
     //  build "$Sanity"
+
     //}
-    //stage ('OWASP top10 SecVal') {
-      //stage = "OWASP top10 SecVal"
-      //sh """
-//python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
-//"""
-    //}
-      stage ('Software Binaries Repo') {
+
+    // sleep 120
+
+   //stage ('OWASP top10 SecVal') {
+
+        //stage = "OWASP top10 SecVal"
+
+    // sh """
+
+   // mvn  -DzapPort=$zapPort -DappUserId=$appUserId -DappPassword=$appPassword -Djvm=$jvm -DzapPath=$zapPath -DtargetUrl=$targetUrl  -DappContext=$appContext -DloginUrl=$loginUrl  br.com.softplan.security.zap:zap-maven-plugin:analyze
+
+   //python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "$JIRA_Prefix"  "$JIRA_Postfix" "$JIRA_Company_Code" "$Application_url" "$Application_url"
+    //"""
+  //}
+
+     stage ('Software Binaries Repo') {
       stage = "Software Binaries Repo"
       sh '''
      /usr/bin/python $Pythonscript $Pro_Build $Module $Artifact_Product $Artifact_Product $nexus_url_release $nexus_url_latest
       '''
-    }
-		
+     }
+
     currentBuild.result = 'SUCCESS'
-  
+
   }
-  
-  
+
     catch (err) { currentBuild.result = 'FAILURE' }
 
-finally {
+    finally {
 
     stage ('Report To JIRA')
-
-{
-
-      sh """
-
-python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" "${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
-
-"""
-
-}
+    {
+     sh """
+     python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}" "${currentBuild.result}" "${JIRA_Prefix}" "${JIRA_Postfix}" "${JIRA_Company_Code}" "${Application_url}"
+     """
+   }
 
     stage ('Send Email') {
 
@@ -113,10 +166,18 @@ python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}"
 
         to: 'bhargava.t@trinitymobility.com,anilkumar@trinitymobility.com,veera@trinitymobility.com,anas@trinitymobility.com,sabjan.p@trinitymobility.com,narasimhamurthy.tn@trinitymobility.com,mahidhar@trinitymobility.com,bharanidharan@trinitymobility.com' )
 
-       }
-    stage ('cleanws'){
-    cleanWs() 
-   }   
+        }
+
+   }
+
+// stage ('cleanws'){
+
+//   cleanWs()
+
+//}  
+
 }
+
 }
-}
+
+ 
