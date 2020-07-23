@@ -13,11 +13,11 @@ node ('jenkins-slave-01') {
       ignoreDirPropChanges: false,
       includedRegions: '',
       locations: [[cancelProcessOnExternalsFail: true, 
-        credentialsId: "$SCM_Cred_ID", 
-        depthOption: 'infinity', 
-        ignoreExternalsOption: true, 
-        local: '.', 
-        remote: '$SCM_checkout']], 
+      credentialsId: "$SCM_Cred_ID", 
+      depthOption: 'infinity', 
+      ignoreExternalsOption: true, 
+      local: '.', 
+      remote: '$SCM_checkout']], 
       quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
     }
 	
