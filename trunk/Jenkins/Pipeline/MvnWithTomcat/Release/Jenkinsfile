@@ -26,10 +26,10 @@ node ('jenkins-slave-01') {
         //sh 'mvn clean verify $Junit_config $DXVaultToken'
       //}
 	  
-       stage ('UnitTest') {
-        stage = "UnitTest"
-        sh 'mvn test verify $Junit_config $DXVaultToken'
-      }
+       //stage ('UnitTest') {
+        //stage = "UnitTest"
+        //sh 'mvn test verify $Junit_config $DXVaultToken'
+      //}
 	
     stage('StaticAnalysis') {
 	 stage = "StaticAnalysis"
