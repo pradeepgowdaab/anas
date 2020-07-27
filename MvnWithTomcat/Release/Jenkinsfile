@@ -106,7 +106,7 @@ python /opt/job_jira_creation.py "${env.JOB_NAME}" "${env.BUILD_URL}" "${stage}"
 
         to: 'bhargava.t@trinitymobility.com,anilkumar@trinitymobility.com,veera@trinitymobility.com,anas@trinitymobility.com,sabjan.p@trinitymobility.com,narasimhamurthy.tn@trinitymobility.com,mahidhar@trinitymobility.com,bharanidharan@trinitymobility.com' )
 
-    }
+                    }
  stage ('cleanws'){
    cleanWs() 
 }   
