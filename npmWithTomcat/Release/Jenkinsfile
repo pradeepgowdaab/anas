@@ -35,7 +35,7 @@ node ('jenkins-slave-01') {
     stage('StaticAnalysis') {
      stage = "StaticAnalysis"
     withSonarQubeEnv('sonar') {
-      sh '$sonarscanner -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'
+      sh '$sonarscanner -Dsonar.projectBaseDir=. -Dsonar.projectKey="$sonarprojectName"  -Dsonar.projectName="$sonarprojectName" -Dsonar.host.url="$sonarhosturl" -Dsonar.login="$sonarlogin" -Dsonar.password="$sonarpassword" -Dsonar.scm.enabled=true -Dsonar.scm.provider=svn -Dsonar.svn.username="$sonarsvnusername" -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" -Dsonar.java.binaries=target/classes -Dsonar.junit.reportsPath=target/surefire-reports -Dsonar.exclusions="$sonarexclusions" -Dsonar.jacoco.reportPath=target/jacoco.exec -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'
     } // submitted SonarQube taskId is automatically attached to the pipeline context1
   }
   
