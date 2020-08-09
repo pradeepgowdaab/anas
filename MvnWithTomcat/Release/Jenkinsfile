@@ -27,7 +27,7 @@ node ('jenkins-slave-01') {
                          }
      stage ('UnitTest') {
       stage = "UnitTest"
-      sh 'mvn test verify $Junit_config $DXVaultToken'
+      sh 'mvn test $Junit_config $DXVaultToken'
     }
 	
 	
