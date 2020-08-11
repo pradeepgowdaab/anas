@@ -1,0 +1,16 @@
+- name: Stop Tomcat Service
+  hosts: {{tomcatServerIP}}
+  tasks:
+    - name: Stop Service
+      win_service:
+        name: {{tomcatServerName}}
+        state: stopped
+    - name: Copy build to tomcat
+      win_copy:
+        src: dist/{{ApplicationID}}
+        dest: 'C:\ApplicationServerSSO\7777-Operator\webapps\ROOT\'
+    - name: start Tomcat Service
+      win_service:
+        name: {{tomcatServerName}}
+        state: started
+
