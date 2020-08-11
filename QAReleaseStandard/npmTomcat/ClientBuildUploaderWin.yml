@@ -3,14 +3,14 @@
   tasks:
     - name: Stop Service
       win_service:
-        name: {{tomcatServerName}}
+        name: {{ServiceID}}
         state: stopped
     - name: Copy build to tomcat
       win_copy:
-        src: dist/{{ApplicationID}}
-        dest: 'C:\ApplicationServerSSO\7777-Operator\webapps\ROOT\'
+        src: {{ApplicationSrcDirs}}
+        dest: {{tomcatDir}}
     - name: start Tomcat Service
       win_service:
-        name: {{tomcatServerName}}
+        name: {{ServiceID}}
         state: started
 

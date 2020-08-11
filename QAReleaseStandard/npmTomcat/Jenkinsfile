@@ -37,14 +37,19 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''npm install $npmBuildParam
-                  npm install -D typescript'''
+            sh '''npm install $npmBuildParam && \
+                  npm install -D typescript && \
+				  npm install'''
              }
 
-        stage ('Complie, Build & Package Client Libraries') {
+        stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-            sh 'ng build --prod $ngBuildParam'
+            sh 'ng build $ngBuildParam'
             }
+        stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            sh '''tar -cvzf $BuildName $ApplicationSrcDir'''
+            }			
 
         stage ('Static Code Analysis') {
             stageName = 'Static Code Analysis'
@@ -85,17 +90,18 @@ node ("$JenkinNodeID") {
             sh ''' ansible-playbook -i \
             $hostspath $AnsibleScriptID \
             -e tomcatServerName="${tomcatServerName}" \
-            -e winServiceID="${winServiceID}" \
+            -e ServiceID="${ServiceID}" \
             -e ApplicationID="${ApplicationID}" \
-            -e dest="${dest}" '''
-            sh ''' cd dest/$ApplicationID
-            jar cvf $BuildName .
+            -e ApplicationSrcDirs="${ApplicationSrcDirs}" \
+            -e tomcatServerIP="${tomcatServerIP}" \
+            -e tomcatDir="${tomcatDir}" '''
+            sh ''' cd $ApplicationID
             '''
             }
   
         stage ('Update Nexus Repo Latest Snapshot') {
           sh ("""curl -v -u $NexusUserID:$NexusUserPass \
-          --upload-file targer/$BuildName \
+          --upload-file $BuildName \
           http://$NexusUrl/repository/$NexusRepoID/QA/latest/$Artifact_Product/$BuildName""")
           }
           currentBuild.result = 'SUCCESS'
