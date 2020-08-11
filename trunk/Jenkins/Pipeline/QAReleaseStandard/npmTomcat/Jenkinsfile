@@ -1,4 +1,4 @@
-node ('$JenkinNodeID') {
+node ("$JenkinNodeID") {
   try {
         stage ('Code Checkout') {
           checkout([
