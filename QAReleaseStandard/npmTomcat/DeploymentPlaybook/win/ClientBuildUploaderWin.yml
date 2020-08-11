@@ -1,5 +1,5 @@
 - name: Stop Tomcat Service
-  hosts: {{tomcatServerIP}}
+  hosts: {{tomcatServerName}}
   tasks:
     - name: Stop Service
       win_service:
