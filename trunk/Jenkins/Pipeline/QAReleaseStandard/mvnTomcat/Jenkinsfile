@@ -98,7 +98,7 @@ node ("$JenkinNodeID") {
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
-          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file target/"${AppBuildName}" ${nexustarget}"'
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file target/"${AppBuildName}" "${nexustarget}"'
           }
           currentBuild.result = 'SUCCESS'
           }
