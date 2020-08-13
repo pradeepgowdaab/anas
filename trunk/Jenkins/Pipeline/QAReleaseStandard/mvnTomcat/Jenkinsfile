@@ -81,7 +81,7 @@ node ("$JenkinNodeID") {
 
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
-          deploy adapters: [tomcat8(credentialsId: '$tomcatToken',
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
           url: "$tomcatUrl")],
           contextPath: null,
           war: '**/*.war'
@@ -96,7 +96,7 @@ node ("$JenkinNodeID") {
           }
           catch (e) { 
             currentBuild.result = 'FAILURE'
-			echo 
+            echo 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
                 summarymsg = 'Application Build Failure in '+"${stageName}"+' Stage, Please take action Immediatly'
@@ -104,12 +104,13 @@ node ("$JenkinNodeID") {
                 echo "${Builderror}"
                 echo "${summarymsg}"
                 echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
                   def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  "${summarymsg}",
                       description: "${descriptionmsg}",
                       issuetype: [name: 'Bug'],
                       assignee: [id: "${JiraDeveloperID}"]]]
-                  response = jiraNewIssue issue: issue, site: "$JiraSite"
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
               }
