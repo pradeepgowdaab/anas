@@ -39,7 +39,7 @@ node ("$JenkinNodeID") {
             stageName = 'npm Dependencies Installation'
             sh '''npm install $npmBuildParam && \
                   npm install -D typescript && \
-				  npm install'''
+                  npm install'''
              }
 
         stage ('Complie, Build Client Libraries') {
@@ -49,7 +49,7 @@ node ("$JenkinNodeID") {
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
             sh '''tar -cvzf $BuildName $ApplicationSrcDir'''
-            }			
+            }            
 
         stage ('Static Code Analysis') {
             stageName = 'Static Code Analysis'
@@ -86,17 +86,25 @@ node ("$JenkinNodeID") {
             stageName = 'Deployment to QA Environment'
             sh '''curl -u $NexusUserID:$NexusUserPass \
             $AnsibleBaseUrl \
-            -o $AnsibleScriptID'''
-            sh ''' ansible-playbook -i \
-            $hostspath $AnsibleScriptID \
-            -e tomcatServerName="${tomcatServerName}" \
-            -e ServiceID="${ServiceID}" \
-            -e ApplicationID="${ApplicationID}" \
-            -e ApplicationSrcDirs="${ApplicationSrcDirs}" \
+            -o "$AnsibleScriptName.zip" && unzip $AnsibleScriptName.zip && cd $AnsibleTarget'''
+            sh ''' ansible-playbook -i hosts \
             -e tomcatServerIP="${tomcatServerIP}" \
-            -e tomcatDir="${tomcatDir}" '''
-            sh ''' cd $ApplicationID
-            '''
+            -e tomcatServerName="${tomcatServerName}" \
+            -e tomcatDir="${tomcatDir}" \
+            -e ApplicationSrcDir="${ApplicationSrcDir}" \
+            -e ApplicationID="${ApplicationID}" \
+            -e ServiceID="${ServiceID}" \
+            -e ansibleUser="${ansibleUser}" \
+            -e ansiblePasswrd="${ansiblePasswrd}" \
+            -e ansible_connection="${ansible_connection}" \
+            -e ApplicationSrcDir="${ApplicationSrcDir}" \
+            -e ApplicationID="${ApplicationID}" \
+            -e ServiceID="${ServiceID}" \
+            -e ansiblePasswrd="${ansiblePasswrd}" \
+            -e ansibleSShPort="${ansibleSShPort}"
+            -e tomcatServerName="${tomcatServerName}" \
+            -e tomcatServerIP="${tomcatServerIP}" '''
+            sh 'cd ..'
             }
   
         stage ('Update Nexus Repo Latest Snapshot') {

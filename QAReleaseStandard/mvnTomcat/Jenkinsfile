@@ -37,20 +37,15 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 
-        stage ('Code Coverage Validation') {
-            stageName = 'Code Coverage Validation'
-            sh 'mvn clean verify $MvnGoal'
-             }
-
-        stage ('Unit test Case Execution') {
+        stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             sh 'mvn test $MvnGoal'
             }
 
-        stage ('Static Code Analysis') {
+        stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''mvn sonar:sonar -Dsonar.projectBaseDir=. \
+            sh '''mvn clean verify $MvnGoal sonar:sonar -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
@@ -105,16 +100,14 @@ node ("$JenkinNodeID") {
             }
             finally {
               stage ('Report the Status into JIRA') {
-                     sh '''python /opt/job_jira_creation.py \
-                    "${env.JOB_NAME}" \
-                    "${env.BUILD_URL}" \
-                    "${stage}" \
-                    "${currentBuild.result}" \
-                    "${JIRA_Prefix}" \
-                    "${JIRA_Postfix}" \
-                    "${JIRA_Company_Code}" \
-                    "${Application_url}"'''
+                if (currentBuild.result = "FAILED") {
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  'Application Build Failure in'+currentBuild.result+' Stage, Please take action',
+                      description: 'Build failure due to'+err,
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
                     }
+              }
               stage ('Email Notification') {
                 emailext (attachmentsPattern: '**/*.html',
                 subject: "Status of IOTHUB-DevSecOps pipeline: ${currentBuild.fullDisplayName}& ${stage}",
