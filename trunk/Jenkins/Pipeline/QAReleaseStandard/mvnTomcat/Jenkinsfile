@@ -88,7 +88,7 @@ node ("$JenkinNodeID") {
         }
 
         stage ('Update Nexus Repo Latest Snapshot') {
-          sh ("""curl -v -u $NexusUserID:$NexusUserPass \
+          sh ("""curl -v -u "$NexusUserID":"$NexusUserPass" \
           --upload-file targer/$BuildName \
           http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$BuildName")
           }
@@ -116,7 +116,7 @@ node ("$JenkinNodeID") {
             finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
-                jiraSendBuildInfo branch: '${JIRAProjecKey}', site: 'trinitymobilitypvtltd.atlassian.net'
+                jiraSendBuildInfo branch: "${JIRAProjecKey}", site: 'trinitymobilitypvtltd.atlassian.net'
               }
               stage ('Finishing: Sitback and Relax')
               {
