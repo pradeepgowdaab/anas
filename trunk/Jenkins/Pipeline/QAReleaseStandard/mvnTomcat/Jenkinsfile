@@ -116,7 +116,7 @@ node ("$JenkinNodeID") {
             finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
-                jiraSendBuildInfo branch: '${JIRAProjecKey}', site: 'trinitymobilitypvtltd.atlassian.net'
+                jiraSendBuildInfo branch: "${JIRAProjecKey}", site: 'trinitymobilitypvtltd.atlassian.net'
               }
               stage ('Sitback and Relax until system Finishing up and Clearing up workspace')
               {
