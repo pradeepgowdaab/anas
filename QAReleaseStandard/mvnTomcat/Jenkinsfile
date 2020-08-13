@@ -114,7 +114,6 @@ node ("$JenkinNodeID") {
               }
             }
             finally {
-              Builderror
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
                 jiraSendBuildInfo branch: '${JIRAProjecKey}', site: 'trinitymobilitypvtltd.atlassian.net'
@@ -123,5 +122,5 @@ node ("$JenkinNodeID") {
               {
               cleanWs() 
               }
-    }
+					}
   }
