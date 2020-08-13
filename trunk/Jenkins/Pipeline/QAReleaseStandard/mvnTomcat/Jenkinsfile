@@ -100,7 +100,8 @@ node ("$JenkinNodeID") {
             }
             finally {
               stage ('Report the Status into JIRA') {
-                if (currentBuild.result = "FAILED") {
+                echo currentBuild.result
+                if (currentBuild.result == "FAILURE") {
                   def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Build Failure in'+currentBuild.result+' Stage, Please take action',
                       description: 'Build failure due to'+err,
