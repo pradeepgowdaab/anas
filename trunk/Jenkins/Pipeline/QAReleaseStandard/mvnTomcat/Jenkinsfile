@@ -88,9 +88,9 @@ node ("$JenkinNodeID") {
         }
 
         stage ('Update Nexus Repo Latest Snapshot') {
-          sh ("""curl -v -u "$NexusUserID":"$NexusUserPass" \
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" \
           --upload-file targer/$BuildName \
-          http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$BuildName")
+          http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$BuildName"'
           }
           currentBuild.result = 'SUCCESS'
           }
@@ -110,7 +110,7 @@ node ("$JenkinNodeID") {
                       assignee: [id: "${JiraDeveloperID}"]]]
                   response = jiraNewIssue issue: issue, site: "$JiraSite"
                   echo response.successful.toString()
-                  echo response.data.toString()           
+                  echo response.data.toString()
               }
             }
             finally {
@@ -122,5 +122,5 @@ node ("$JenkinNodeID") {
               {
               cleanWs() 
               }
-    }
-  }
+              }
+              }
