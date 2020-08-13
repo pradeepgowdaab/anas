@@ -94,7 +94,7 @@ node ("$JenkinNodeID") {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
               packaging = readMavenPom().getPackaging()
-              buildname = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+              BuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" \
           --upload-file targer/$BuildName \
           http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$BuildName"'
