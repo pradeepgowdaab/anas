@@ -95,19 +95,26 @@ node ("$JenkinNodeID") {
           }
           currentBuild.result = 'SUCCESS'
           }
-          catch (err) { 
-            currentBuild.result = 'FAILURE' 
-            }
-            finally {
-              stage ('Report the Status into JIRA') {
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = e
+              stage ('Report Error Status into JIRA') {
                 echo currentBuild.result
                 if (currentBuild.result == "FAILURE") {
                   def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Build Failure in'+currentBuild.result+' Stage, Please take action',
-                      description: 'Build failure due to'+err,
+                      description: 'Build failure due to'+${Builderror},
                       issuetype: [name: 'Bug'],
                       assignee: [id: "${JiraDeveloperID}"]]]
                     }
+                    throw e
+              }
+            }
+            finally {
+              Builderror
+              stage ('Updation of Build Status into JIRA') {
+                echo currentBuild.result
+                jiraSendBuildInfo branch: '${JIRAProjecKey}', site: 'trinitymobilitypvtltd.atlassian.net'
               }
               stage ('Email Notification') {
                 emailext (attachmentsPattern: '**/*.html',
