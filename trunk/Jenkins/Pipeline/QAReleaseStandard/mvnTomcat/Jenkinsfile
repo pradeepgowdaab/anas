@@ -95,6 +95,7 @@ node ("$JenkinNodeID") {
               VERSION = readMavenPom().getVersion()
               packaging = readMavenPom().getPackaging()
               AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               echo "${AppBuildName}"
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" \
           --upload-file **/"${AppBuildName}" \
