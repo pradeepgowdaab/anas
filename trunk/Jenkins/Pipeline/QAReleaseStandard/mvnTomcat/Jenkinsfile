@@ -97,10 +97,9 @@ node ("$JenkinNodeID") {
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
-              echo "${qg.status}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application Build Failure in '+"${stageName}"+' Stage, Please take action Immediatly'
-                descriptionmsg = 'Build failure due to '+"${Builderror}"+' '+"${qg.status}"
+                summarymsg = 'Application Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
                 echo "${descriptionmsg}"
