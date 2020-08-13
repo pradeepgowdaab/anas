@@ -94,10 +94,10 @@ node ("$JenkinNodeID") {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
               packaging = readMavenPom().getPackaging()
-              BuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+              AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" \
-          --upload-file targer/$BuildName \
-          http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$BuildName"'
+          --upload-file targer/"$AppBuildName" \
+          http://"$NexusUrl"/repository/"$NexusRepoID"/QA/latest/"$Artifact_Product"/"$AppBuildName"'
           }
           currentBuild.result = 'SUCCESS'
           }
