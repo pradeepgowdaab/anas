@@ -95,8 +95,7 @@ node ("$JenkinNodeID") {
           currentBuild.result = 'SUCCESS'
           }
           catch (e) { 
-            currentBuild.result = 'FAILURE'
-            echo 
+            currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
                 summarymsg = 'Application Build Failure in '+"${stageName}"+' Stage, Please take action Immediatly'
@@ -118,7 +117,7 @@ node ("$JenkinNodeID") {
             finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
-                jiraSendBuildInfo branch: "${JIRAProjecKey}", site: 'trinitymobilitypvtltd.atlassian.net'
+                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
               }
               stage ('Finishing: Sitback and Relax')
               {
