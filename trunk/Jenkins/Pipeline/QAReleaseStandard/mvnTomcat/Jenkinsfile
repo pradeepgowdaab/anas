@@ -91,6 +91,8 @@ node ("$JenkinNodeID") {
         }
 
         stage ('Update Nexus Repo Latest Snapshot') {
+              if("$BuildWithVerNo" == true)
+              {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
               packaging = readMavenPom().getPackaging()
@@ -100,8 +102,20 @@ node ("$JenkinNodeID") {
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
-
-          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+              else
+              {
+              artifact = readMavenPom().getArtifactId()
+              packaging = readMavenPom().getPackaging()
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
           }
           currentBuild.result = 'SUCCESS'
           }
