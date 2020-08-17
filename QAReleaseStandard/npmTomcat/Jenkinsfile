@@ -1,4 +1,5 @@
-node ("$JenkinNodeID") {
+node ("$JenkinNodeID")
+ {
   try {
         stage ('Code Checkout') {
           checkout([
@@ -37,7 +38,7 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''npm install "$npmBuildParam" && \
+            sh '''npm update && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
                   npm install'''
              }
