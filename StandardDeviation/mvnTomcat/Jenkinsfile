@@ -43,6 +43,8 @@ node ("$JenkinNodeID") {
           }
 
         stage ('Update Nexus Repo Latest Snapshot') {
+            if("$BuildWithVerNo" == true)
+              {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
               packaging = readMavenPom().getPackaging()
@@ -55,6 +57,7 @@ node ("$JenkinNodeID") {
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
+        }
           currentBuild.result = 'SUCCESS'
           }
           catch (e) { 
