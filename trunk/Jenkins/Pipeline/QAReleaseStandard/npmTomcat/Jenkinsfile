@@ -95,7 +95,8 @@ node ("$JenkinNodeID")
           war: '**/*.war'
         }
         }
-  
+          if("$NexusRepoReq" == true)
+              {
         stage ('Update Nexus Repo Latest Snapshot') {
 
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"
@@ -105,6 +106,7 @@ node ("$JenkinNodeID")
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
+              }
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
