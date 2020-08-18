@@ -62,7 +62,7 @@ node ("$JenkinNodeID") {
               artifact = readMavenPom().getArtifactId()
               packaging = readMavenPom().getPackaging()
               AppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
