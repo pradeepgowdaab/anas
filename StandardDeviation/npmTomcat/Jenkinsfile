@@ -37,9 +37,9 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''npm install && \
+            sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
-                  npm install "$npmBuildParam"'''
+                  npm install'''
              }
 
         stage ('Complie, Build Client Libraries') {
