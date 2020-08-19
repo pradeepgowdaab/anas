@@ -42,7 +42,7 @@ node ("$JenkinNodeID") {
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-            sh 'ng build "$ngBuildParam"'
+            sh 'ng build'
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
