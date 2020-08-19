@@ -89,10 +89,10 @@ node ("$JenkinNodeID") {
           war: '**/*.war'
         }
         }
-        if("$NexusRepoReq" == true)
+        if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
-              if("$BuildWithVerNo" == true)
+              if("$BuildWithVerNo" == 'true')
               {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
