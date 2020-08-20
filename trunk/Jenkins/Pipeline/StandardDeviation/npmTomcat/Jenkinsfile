@@ -39,8 +39,7 @@ node ("$JenkinNodeID") {
             stageName = 'npm Dependencies Installation'
            sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript@latest && \
-                  npm install && \
-				  ng update --next @angular/cli --force'''
+                  npm install'''
              }
 
         stage ('Complie, Build Client Libraries') {
