@@ -79,7 +79,7 @@ node ("$JenkinNodeID") {
           sh 'mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
-        if("$isDeploymentReq" == true)
+        if("$isDeploymentReq" == 'true')
         {
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
