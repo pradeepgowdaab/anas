@@ -85,7 +85,7 @@ node ("$JenkinNodeID")
             zip archive: true, dir: 'dist', glob: '', zipFile: "$BuildName"
             }
         echo"$isDeploymentReq"
-        if("$isDeploymentReq" == true)
+        if("$isDeploymentReq" == 'true')
         {
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
@@ -95,7 +95,7 @@ node ("$JenkinNodeID")
           war: '**/*.war'
         }
         }
-          if("$NexusRepoReq" == true)
+          if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
 
