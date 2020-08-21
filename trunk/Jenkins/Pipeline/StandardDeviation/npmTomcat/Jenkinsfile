@@ -37,7 +37,7 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-           sh '''npm install "$npmBuildParam" && \
+           sh '''rm -r node_modules && \ rm package-lock.json && \
                   npm install -D typescript && \
                   npm install'''
              }
