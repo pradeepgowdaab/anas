@@ -37,7 +37,7 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-           sh '''rm package-lock.json && \
+           sh '''npm install --registry http://192.168.1.143:8081/repository/Trinity_npm/ sopexec@0.0.4 --save && \
                   npm install -D typescript && \
                   npm install'''
              }
