@@ -39,7 +39,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'mvn  verify "${MvnGoal}"'
+            sh 'mvn clean verify $MvnGoal'
             }
 
         stage ('Static Code Analysis & Coverage Validation') {
