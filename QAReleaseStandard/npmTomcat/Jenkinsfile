@@ -100,7 +100,7 @@ node ("$JenkinNodeID")
         stage ('Update Nexus Repo Latest Snapshot') {
 
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
-              finalOut = "$BuildName"+' '+"${nexustarget}"
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
