@@ -89,9 +89,6 @@ node ("$JenkinNodeID") {
                 echo currentBuild.result
                 jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
 				}
-				stage ('Finishing: Sitback and Relax')
-              {
-               cleanWs() 
-              }
+				
               }
   }
