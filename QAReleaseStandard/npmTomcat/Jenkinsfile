@@ -61,6 +61,7 @@ node ("$JenkinNodeID")
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
+            -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
@@ -112,8 +113,8 @@ node ("$JenkinNodeID")
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
-                descriptionmsg = 'Build failure due to ' + "${Builderror}"
+                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
                 echo "${descriptionmsg}"
