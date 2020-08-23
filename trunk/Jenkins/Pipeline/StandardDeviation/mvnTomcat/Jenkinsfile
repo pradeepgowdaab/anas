@@ -43,7 +43,7 @@ node ("$JenkinNodeID") {
           }
 
         stage ('Update Nexus Repo Latest Snapshot') {
-            if("$BuildWithVerNo" == true)
+            if("$BuildWithVerNo" == 'true')
               {
               artifact = readMavenPom().getArtifactId()
               VERSION = readMavenPom().getVersion()
@@ -76,8 +76,8 @@ node ("$JenkinNodeID") {
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
-                descriptionmsg = 'Build failure due to ' + "${Builderror}"
+                summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
                 echo "${descriptionmsg}"
