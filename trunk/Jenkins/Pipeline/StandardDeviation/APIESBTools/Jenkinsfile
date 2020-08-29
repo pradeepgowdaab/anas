@@ -42,7 +42,6 @@ node ("$JenkinNodeID") {
     def VERSION = pom.getVersion()
     def packaging = 'car'
     def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
-    def AppBuildName = "${artifact}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
