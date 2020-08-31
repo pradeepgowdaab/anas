@@ -59,7 +59,7 @@ node ("$JenkinNodeID") {
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
