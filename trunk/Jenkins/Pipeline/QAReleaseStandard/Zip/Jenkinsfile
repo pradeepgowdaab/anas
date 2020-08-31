@@ -38,7 +38,7 @@ node ("$JenkinNodeID")
 
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-			cp . ./$BuildName
+			cp -R *.* $BuildName
             zip archive: true, dir: '.'+"$BuildName", glob: '', zipFile: "$BuildName"+'.zip'
             }
         
