@@ -45,8 +45,7 @@ node ("$JenkinNodeID") {
     def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-          sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true' 
+          stageName = 'Application Build Packaging' 
           sh "cd ${RegPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           }
