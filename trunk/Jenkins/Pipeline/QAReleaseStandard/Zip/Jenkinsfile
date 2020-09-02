@@ -36,7 +36,6 @@ node ("$JenkinNodeID")
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 		  
-		  def buildNumber = env.BUILD_NUMBER
          def workspace = env.WORKSPACE
 
         stage ('Package Client Libraries') {
@@ -48,7 +47,7 @@ node ("$JenkinNodeID")
               {
         stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'/'+"$buildNumber"+'/'+"$BuildName"+'.zip'
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'/'+"$BuildName"+'.zip'
               finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
