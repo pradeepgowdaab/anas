@@ -35,11 +35,13 @@ node ("$JenkinNodeID")
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
+		  
+		  def buildNumber = env.BUILD_NUMBER
+         def workspace = env.WORKSPACE
 
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-			cp -R *.* $BuildName
-            zip archive: true, dir: '.'+"$BuildName", glob: '', zipFile: "$BuildName"+'.zip'
+            zip archive: true, dir: "$workspace"+"$BuildName", glob: '', zipFile: "$BuildName"+"buildNumber"+'.zip'
             }
         
           if("$NexusRepoReq" == 'true')
