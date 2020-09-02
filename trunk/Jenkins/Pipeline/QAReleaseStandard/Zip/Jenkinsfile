@@ -41,7 +41,7 @@ node ("$JenkinNodeID")
 
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: "$workspace"+"$BuildName", glob: '', zipFile: "$BuildName"+"buildNumber"+'.zip'
+            zip archive: true, dir: "$workspace", glob: '', zipFile: "$BuildName"+"buildNumber"+'.zip'
             }
         
           if("$NexusRepoReq" == 'true')
