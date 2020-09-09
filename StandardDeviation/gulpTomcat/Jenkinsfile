@@ -53,13 +53,13 @@ node ("$JenkinNodeID") {
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'release/', glob: '', zipFile: "$BuildName"+'.zip'
+            zip archive: true, dir: 'release/', glob: '', zipFile: "$BuildName"+'.war'
             }
 
         stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
-              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
