@@ -35,6 +35,10 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
+		  def  artifact = readMavenPom().getArtifactId()
+          def    VERSION = readMavenPom().getVersion()
+          def   packaging = readMavenPom().getPackaging()
+          def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
 
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
@@ -94,10 +98,6 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-              artifact = readMavenPom().getArtifactId()
-              VERSION = readMavenPom().getVersion()
-              packaging = readMavenPom().getPackaging()
-              AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
