@@ -50,7 +50,6 @@ node ("$JenkinNodeID") {
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
              sh 'gulp' 
-			 sh 'sudo n latest'
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
