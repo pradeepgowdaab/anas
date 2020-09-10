@@ -40,14 +40,14 @@ node ("$JenkinNodeID") {
              sh '''sudo n $nodejsVersion \
                   npm install && bower install --allow-root \
                   npm install -g $bowerParam \
-                  npm install -g $gulpParam \
-				  npm install'''
+                  npm install -g $gulpParam'''
              }
                                  
              
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
+			 sh 'npm i'
              sh 'gulp' 
             }
         stage ('Package Client Libraries') {
