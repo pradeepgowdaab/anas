@@ -37,8 +37,7 @@ node ("$JenkinNodeID") {
           }
   
           def    artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()
-          def    packaging = zip
+          def    VERSION = readMavenPom().getVersion()    
           def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
 
         stage ('Application Build Packaging') {
@@ -49,7 +48,7 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
-              
+              packaging = "zip"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
@@ -60,6 +59,7 @@ node ("$JenkinNodeID") {
           }
           else
               {
+			  packaging = "zip"
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
