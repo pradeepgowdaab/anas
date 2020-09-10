@@ -49,7 +49,7 @@ node ("$JenkinNodeID") {
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
              sh '''
-			 gulp
+			 gulp \
 			 sudo n latest
 			 '''
             }
