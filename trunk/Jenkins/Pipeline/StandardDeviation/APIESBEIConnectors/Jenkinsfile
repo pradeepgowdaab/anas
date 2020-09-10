@@ -36,9 +36,11 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
   
-          def    artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()    
-          def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+    def pom = readMavenPom file: "pom.xml"
+    def artifact = pom.getArtifactId()
+    def VERSION = pom.getVersion()
+    def packaging = 'zip'
+    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
