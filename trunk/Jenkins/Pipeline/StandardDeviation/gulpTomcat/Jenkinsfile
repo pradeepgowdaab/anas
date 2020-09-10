@@ -37,11 +37,10 @@ node ("$JenkinNodeID") {
 
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
-                  sudo n $nodejsVersion \
+             sh '''sudo n $nodejsVersion \
                   npm install && bower install --allow-root \
                   npm install -g $bowerParam \
-                  npm install -g $gulpParam \
+                  npm install -g $gulpParam 
                   '''
              }
                                  
