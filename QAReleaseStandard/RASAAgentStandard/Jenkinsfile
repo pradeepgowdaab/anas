@@ -39,8 +39,8 @@ node ("$JenkinNodeID")
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
             sh '''
-			source /root/venv/bin/activate
-			cd $WORKSPACE 
+			//source /root/venv/bin/activate
+			//cd $WORKSPACE 
 			/root/venv/bin/rasa train --fixed-model-name $BuildName
             source /root/venv/bin/deactivate 			
 			'''
