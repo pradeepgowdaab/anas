@@ -42,7 +42,7 @@ node ("$JenkinNodeID")
 			source ./venv/bin/activate \
 			cd $workspace \
 			rasa train --fixed-model-name $BuildName \
-            source ./venv/bin/deactivate \			
+            source ./venv/bin/deactivate 			
 			'''
             }
        stage ('Static Code Analysis & Coverage Validation') {
