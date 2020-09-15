@@ -73,12 +73,6 @@ node ("$JenkinNodeID")
               }
           }
         }
-
-
-        stage ('Package Client Libraries') {
-            stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'models', glob: '', zipFile: "$BuildName"+'.zip'
-            }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
@@ -94,8 +88,8 @@ node ("$JenkinNodeID")
               {
         stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
-              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.tar.gz'
+              finalOut = 'models/'+"$BuildName"+'.tar.gz'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
