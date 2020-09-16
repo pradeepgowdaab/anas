@@ -39,6 +39,7 @@ node ("$JenkinNodeID") {
             stageName = 'npm Dependencies Installation'
              sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
+				  npm install && \
                   npm install moment@$momentV && npm install moment-timezone@$momenttimezoneV'''
              }
                                  
