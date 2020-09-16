@@ -47,7 +47,7 @@ node ("$JenkinNodeID") {
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh ''' cp google-services.json platforms/android/app && \
+             sh ''' $CpParam && \
 			 ionic cordova run android '''
             }
         
