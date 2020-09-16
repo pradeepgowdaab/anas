@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh 'node $max_old_space_size node_modules/@angular/cli/bin/ng build "$ngBuildParam"'
+             sh 'node $max_old_space_size node_modules/@angular/cli/bin/ng build --aot --configuration=production --output-hashing=all --source-map=false --extract-css=true --named-chunks=false --build-optimizer=false'
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
