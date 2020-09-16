@@ -37,7 +37,7 @@ node ("$JenkinNodeID") {
 
         stage ('Gradle Dependencies Installation') {
             stageName = 'gradlew Dependencies Installation'
-             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && npm i -g cordova-res && ionic cordova resources android --force && \
 			      /usr/local/bin/ionic cordova $ionicparam && \
 				  /usr/local/bin/cordova clean android '''
              }
