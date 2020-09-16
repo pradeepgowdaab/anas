@@ -35,7 +35,7 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 
-        stage ('gradle Dependencies Installation') {
+        stage ('Gradle Dependencies Installation') {
             stageName = 'gradlew Dependencies Installation'
              sh '''chmod +x gradlew &&\
 			      ./gradlew clean
