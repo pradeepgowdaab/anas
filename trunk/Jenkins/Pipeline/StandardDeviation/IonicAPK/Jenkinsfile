@@ -47,7 +47,7 @@ node ("$JenkinNodeID") {
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
              sh ''' $CpParam && \
-			 /usr/local/bin/ionic cordova run android '''
+			 /usr/local/bin/ionic cordova run android || error=true'''
             }
         
        stage ('Update Nexus Repo Latest Snapshot') {
