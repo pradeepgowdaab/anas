@@ -41,8 +41,9 @@ node ("$JenkinNodeID") {
           stageName = 'Application Build Packaging'
           sh '''
            cd master/ && \		  
-		  /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'''
-		  sh '/usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
+		  /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true && \
+		  cd . && \
+         /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true '''
 		  
           }
 		  stage ('Package Build Libraries') {
