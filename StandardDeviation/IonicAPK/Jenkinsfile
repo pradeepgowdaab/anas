@@ -40,7 +40,6 @@ node ("$JenkinNodeID") {
              sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
 			      ionic cordova $ionicparam && \
 				  cordova clean android '''
-			 '''
              }
                                  
              
