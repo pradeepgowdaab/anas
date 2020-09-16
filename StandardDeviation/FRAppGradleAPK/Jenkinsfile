@@ -50,13 +50,13 @@ node ("$JenkinNodeID") {
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'app/build/outputs/apk/debug/'+"$BuildName", glob: '', zipFile: "$BuildName"+"-debug"+'.apk'
+            zip archive: true, dir: 'app/build/outputs/apk/debug/'+"$BuildName"+'-'+"debug", glob: '', zipFile: "$BuildName"+'-'+"debug"+'.apk'
             }
 
         stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+"-debug"+'.apk'
-              finalOut = "$BuildName"+"-debug"+'.apk'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"debug"+'.apk'
+              finalOut = "$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
