@@ -42,7 +42,7 @@ node ("$JenkinNodeID") {
           sh '''
            cd master/ && \		  
 		  /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true && \
-		  cd . && \
+		  cd .. && \
          /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true '''
 		  
           }
