@@ -43,13 +43,13 @@ node ("$JenkinNodeID") {
 		  /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true && \
 		  cd .. && \
          /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true &&  \
-		 mkdir $BuildName && \
-		 find -iname '*.war' -exec cp {} "$BuildName"/ \;'''
+		 mkdir target2 && \
+		 find -iname '*.war' -exec cp {} target2/ \;'''
 		  
           }
 		  stage ('Package Build Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: "$BuildName/", glob: '', zipFile: "$BuildName"+'.zip'
+            zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
             }
 
         stage ('Update Nexus Repo Latest Snapshot') {
