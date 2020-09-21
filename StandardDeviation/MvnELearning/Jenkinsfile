@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh '''
-           cd master && \		  
+           cd ./master && \		  
 		  /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true && \
 		  cd .. && \
          /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true &&  \
