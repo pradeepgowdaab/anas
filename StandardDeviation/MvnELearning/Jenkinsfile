@@ -44,8 +44,7 @@ node ("$JenkinNodeID") {
 		  cd .. && \
          /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true &&  \
 		 mkdir $BuildName && \
-		 find -iname '*.war' -exec cp {} $BuildName/ \; 
-		 '''
+		 find -iname '*.war' -exec cp {} "$BuildName"/ \;'''
 		  
           }
 		  stage ('Package Build Libraries') {
