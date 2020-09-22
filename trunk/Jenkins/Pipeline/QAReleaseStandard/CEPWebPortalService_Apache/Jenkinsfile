@@ -69,10 +69,10 @@ node ("$JenkinNodeID")
           }
         }
 		 echo"$isDeploymentReq"
+		 def ApplicationSrcDir=$workspace
         if("$isDeploymentReq" == 'true')
-        {
-		def ApplicationSrcDir=$workspace
-        stage ('Deployment to QA Environment') {
+		{
+       stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
           sh '''
 		  mkdir ansible && \
