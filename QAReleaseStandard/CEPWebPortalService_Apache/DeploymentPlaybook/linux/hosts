@@ -7,5 +7,5 @@
 AnsibleScriptID={{AnsibleScriptID}}
 tomcatServerIP={{tomcatServerIP}}
 tomcatDir={{tomcatDir}}
-ApplicationSrcDir={{ApplicationSrcDir}}
+ApplicationSrcDirs={{ApplicationSrcDirs}}
 ServiceID={{ServiceID}}

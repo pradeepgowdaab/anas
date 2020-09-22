@@ -68,19 +68,20 @@ node ("$JenkinNodeID")
               }
           }
         }
+		 def workspace = env.WORKSPACE
+		 def ApplicationSrcDir = env.WORKSPACE
 		 echo"$isDeploymentReq"
-		 def ApplicationSrcDir=$workspace
         if("$isDeploymentReq" == 'true')
-		{
-       stage ('Deployment to QA Environment') {
+        {
+         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
           sh '''
 		  mkdir ansible && \
 		  cd ansible && \
-		  svn checkout http://192.168.1.69/svn/DevSecOps/trunk/Jenkins/Pipeline/QAReleaseStandard/CEPWebPortalService_Apache/DeploymentPlaybook/linux && \\
-		  cd ..
-		  /usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e tomcatServerIP="${tomcatServerIP}" -e ansibleUser="${ansibleUser}" -e ansiblePasswrd="${ansiblePasswrd}" -e ansibleSShPort="${ansibleSShPort}" -e AnsibleScriptID="${AnsibleScriptID}" -e tomcatDir="${tomcatDir}" -e ApplicationSrcDir="${ApplicationSrcDir}" -e ServiceID="${ServiceID}"
-		  
+		  svn checkout http://192.168.1.69/svn/DevSecOps/trunk/Jenkins/Pipeline/QAReleaseStandard/CEPWebPortalService_Apache/DeploymentPlaybook/linux && \
+		  cd .. && \
+		  cp -r ansible/linux/* '.' && \
+		  /usr/bin/ansible-playbook -i hosts ClientBuildUploader.yml --e tomcatServerIP="${tomcatServerIP}" -e ansibleUser="${ansibleUser}" -e ansiblePasswrd="${ansiblePasswrd}" -e ansibleSShPort="${ansibleSShPort}" -e AnsibleScriptID="${AnsibleScriptID}" -e tomcatDir="${tomcatDir}" -e ApplicationSrcDirs="/opt/jenkins/workspace/${ApplicationSrcDirs}" -e ServiceID="${ServiceID}"
 		  '''
         }
         }
