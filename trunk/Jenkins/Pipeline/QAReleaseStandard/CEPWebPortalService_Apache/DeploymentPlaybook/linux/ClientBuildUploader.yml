@@ -1,5 +1,5 @@
 - name: Stop Tomcat Service
-  hosts: '{{tomcatServerIP}}'
+  hosts: TargetServer
   tasks:
     - name: Stop Service
       service:
