@@ -1,15 +1,15 @@
 - name: Stop Tomcat Service
-  hosts: {{tomcatServerIP}}
+  hosts: '{{tomcatServerIP}}'
   tasks:
     - name: Stop Service
       service:
-        name: {{ServiceID}}
+        name: '{{ServiceID}}'
         state: stopped
     - name: Copy build to tomcat
       copy:
-        src: {{ApplicationSrcDirs}}
-        dest: {{tomcatDir}}
+        src: '{{ApplicationSrcDirs}}'
+        dest: '{{tomcatDir}}'
     - name: start Tomcat Service
       service:
-        name: {{ServiceID}}
+        name: '{{ServiceID}}'
         state: started
