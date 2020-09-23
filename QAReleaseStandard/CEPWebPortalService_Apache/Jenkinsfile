@@ -50,11 +50,7 @@ node ("$JenkinNodeID")
             -Dsonar.scm.provider=svn \
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
-            -Dsonar.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+            -Dsonar.exclusions="$sonarexclusions"'''
           }
           }
 
