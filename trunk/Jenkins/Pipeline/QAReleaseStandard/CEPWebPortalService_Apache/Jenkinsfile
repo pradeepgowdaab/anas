@@ -68,7 +68,6 @@ node ("$JenkinNodeID")
               }
           }
         }
-		 def workspace = env.WORKSPACE
 		 echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
