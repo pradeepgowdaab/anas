@@ -39,7 +39,8 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
           def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-
+       	 echo"$isUnitTCaseEReq"
+        if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
