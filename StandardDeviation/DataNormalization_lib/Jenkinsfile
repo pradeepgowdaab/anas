@@ -37,11 +37,11 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
     def pom = readMavenPom file: "${CAPath}/pom.xml"
-	def finalName = pom.getfinalName()
+	def artifactId = pom.getParent()..getArtifactId()
     def VERSION = pom.getVersion()
     def packaging = 'nar'
-    def AppBuildName = "${finalName}"+"_"+"${VERSION}"+"."+"${packaging}"
-     echo $finalName
+    def AppBuildName = "${artifactId}"+"_"+"${VERSION}"+"."+"${packaging}"
+     echo $artifactId
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh '/usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true -Dspotbugs.skip=true -Dcheckstyle.skip -Dfindbugs.skip=true'
