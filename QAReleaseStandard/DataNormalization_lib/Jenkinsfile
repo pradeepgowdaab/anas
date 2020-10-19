@@ -1,0 +1,136 @@
+node ("$JenkinNodeID") {
+         
+  try {
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+    
+    def pom = readMavenPom file: "${CAPath}/pom.xml"
+    def artifact = pom.getArtifactId()
+    def VERSION = pom.getVersion()
+    def packaging = 'nar'
+    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
+    
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh '/usr/lib/maven354/bin/mvn clean install'
+          }
+
+          stage ('Static Code Analysis & Coverage Validation') {
+            stageName = 'Static Code Analysis'
+            withSonarQubeEnv('sonar') {
+            sh '''cd $BuildName && mvn sonar:sonar -Dsonar.projectBaseDir=. \
+            -Dsonar.projectKey="$sonarprojectName" \
+            -Dsonar.projectName="$sonarprojectName" \
+            -Dsonar.host.url="$sonarhosturl" \
+            -Dsonar.login="$sonarlogin" \
+            -Dsonar.password="$sonarpassword" \
+            -Dsonar.scm.enabled=true \
+            -Dsonar.scm.provider=svn \
+            -Dsonar.svn.username="$sonarsvnusername" \
+            -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+            -Dsonar.exclusions="$sonarexclusions" \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.jacoco.reportPath=target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+          }
+          }
+
+          stage ('Quality Gate Validation') {
+          stageName = 'Quality Gate'
+          def qg = waitForQualityGate()
+          timeout(time: 1, unit: 'HOURS') {
+            echo '$qg'
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+        }
+
+        if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+            if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
+          else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+        }
+              }
+          currentBuild.result = 'SUCCESS'
+          }
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+              }
+            }
+            finally {
+              stage ('Updation of Build Status into JIRA') {
+                echo currentBuild.result
+                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
+              }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
+              }
