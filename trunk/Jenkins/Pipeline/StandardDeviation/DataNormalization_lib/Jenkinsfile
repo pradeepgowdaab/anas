@@ -36,7 +36,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-	def pom = readMavenPom file: "pom.xml"
+	def pom1 = readMavenPom file: "pom.xml"
     def artifact = pom.getfinalName()	
     def pom = readMavenPom file: "${CAPath}/pom.xml"
     def VERSION = pom.getVersion()
