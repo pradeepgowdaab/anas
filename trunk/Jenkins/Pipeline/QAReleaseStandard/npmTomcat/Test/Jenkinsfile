@@ -96,7 +96,7 @@ node ("$JenkinNodeID")
           contextPath: "$contextPath",
           war: '**/*.war'
         }
-		else
+		else if
 		{
 		if("$isDeploymentReq" == 'true')
 		if("$iswindowsReq" == 'true')
