@@ -35,7 +35,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-          stage ('Code Checkout Client') {
+          stage ('Client Code Checkout ') {
           /* groovylint-disable-next-line TrailingComma */
          checkout([
              $class: 'SubversionSCM',
