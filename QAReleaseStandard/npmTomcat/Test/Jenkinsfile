@@ -97,7 +97,7 @@ node ("$JenkinNodeID")
           war: '**/*.war'
         }
 		else
-		if("$isDeploymentReq" == 'true'){
+		if("$isDeploymentReq" == 'true')
 		if("$iswindowsReq" == 'true')
 		{
         stage ('Deployment to QA Environment') {
@@ -109,7 +109,7 @@ node ("$JenkinNodeID")
         }
 		}
 		else
-		if("$isDeploymentReq" == 'true'){
+		if("$isDeploymentReq" == 'true')
 		if("$isUbuntuReq" == 'true')
 		{
         stage ('Deployment to QA Environment') {
