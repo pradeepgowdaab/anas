@@ -35,7 +35,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-          stage ('Client Code Checkout ') {
+          stage ('Code Checkout Client') {
           /* groovylint-disable-next-line TrailingComma */
          checkout([
              $class: 'SubversionSCM',
@@ -79,7 +79,7 @@ node ("$JenkinNodeID") {
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
-            sh '''rm -rf Server/src/main/webapp/$BuildName && mv client/dist/$BuildName Server/src/main/webapp/'''
+            sh '''rm -rf Server/src/main/webapp/$ClientBuildName && mv client/dist/$ClientBuildName Server/src/main/webapp/'''
              }
 
             def pom = readMavenPom file: "Server/pom.xml"
@@ -214,10 +214,6 @@ node ("$JenkinNodeID") {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
                 jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-              }
-			  stage ('Finishing: Sitback and Relax')
-              {
-              cleanWs() 
               }
               }
               }
