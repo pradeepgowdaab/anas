@@ -96,7 +96,6 @@ node ("$JenkinNodeID")
           contextPath: "$contextPath",
           war: '**/*.war'
         }
-		else
 		if("$isDeploymentReq" == 'true')
 		if("$iswindowsReq" == 'true')
 		{
@@ -108,7 +107,6 @@ node ("$JenkinNodeID")
           war: '**/*.war'
         }
 		}
-		else
 		if("$isDeploymentReq" == 'true')
 		if("$isUbuntuReq" == 'true')
 		{
