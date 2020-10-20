@@ -79,7 +79,7 @@ node ("$JenkinNodeID") {
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
-            sh '''rm -rf Server/src/main/webapp/$ClientBuildName && mv client/dist/$ClientBuildName/* Server/resources/static/'''
+            sh '''rm -rf Server/src/main/webapp/$ClientBuildName && mv client/dist/$ClientBuildName/* Server/src/main/resources/static/'''
              }
 
             def pom = readMavenPom file: "Server/pom.xml"
