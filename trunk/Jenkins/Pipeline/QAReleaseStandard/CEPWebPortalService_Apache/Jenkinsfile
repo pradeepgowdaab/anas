@@ -77,7 +77,7 @@ node ("$JenkinNodeID")
          sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
-		 sh '''ln -s . $BuildName'''  
+		 sh '''mv ./$BuildName'''  
         sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "$BuildName"  "$remoteuser@$remotehost:$tomcatDir/"'''
         sh'''
