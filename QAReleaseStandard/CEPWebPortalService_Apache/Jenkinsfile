@@ -57,7 +57,7 @@ node ("$JenkinNodeID")
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
           }
-
+         if("$isQGValidationReq" == 'true')
         stage ('Quality Gate Validation') {
           stageName = 'Quality Gate'
           def qg = waitForQualityGate()
