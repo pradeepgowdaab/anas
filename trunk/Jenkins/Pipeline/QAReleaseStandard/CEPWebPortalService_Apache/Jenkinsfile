@@ -37,6 +37,7 @@ node ("$JenkinNodeID")
           }
 		  
          def workspace = env.WORKSPACE
+		 if("$isStaticReq" == 'true')
 		 stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
@@ -76,8 +77,9 @@ node ("$JenkinNodeID")
          sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
+		 sh '''ln -s . $$BuildName'''  
         sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "${WORKSPACE}/*"  "$remoteuser@$remotehost:$tomcatDir$BuildName/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "."  "$remoteuser@$remotehost:$tomcatDir$BuildName/"'''
         sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
         echo $Deployment to QA Environment'''
