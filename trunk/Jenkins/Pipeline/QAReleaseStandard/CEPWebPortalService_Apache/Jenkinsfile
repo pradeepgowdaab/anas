@@ -74,12 +74,12 @@ node ("$JenkinNodeID")
          stage('Deployment to QA Environment'){
          stage='Deployment to QA Environment'     
          sh'''
-         /usr/bin/sshpass -o StrictHostKeyChecking=no -p "$remotepassword" ssh  $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
+         /usr/bin/sshpass  -p "$remotepassword" ssh  $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
         sh '''
-		sshpass -o StrictHostKeyChecking=no -p "$remotepassword" scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "."  "$remoteuser@$remotehost:$tomcatDir$BuildName/"'''
+		sshpass  -p "$remotepassword" scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "."  "$remoteuser@$remotehost:$tomcatDir$BuildName/"'''
         sh'''
-        /usr/bin/sshpass -o StrictHostKeyChecking=no -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
         echo $Deployment to QA Environment'''
         }
         }
