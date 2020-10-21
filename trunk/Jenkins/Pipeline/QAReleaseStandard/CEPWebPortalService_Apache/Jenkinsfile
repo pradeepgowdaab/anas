@@ -74,7 +74,7 @@ node ("$JenkinNodeID")
          stage('Deployment to QA Environment'){
          stage='Deployment to QA Environment'     
          sh'''
-         /usr/bin/sshpass  -p "$remotepassword" ssh  $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
+         /usr/bin/sshpass -p "$remotepassword" ssh  $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
         sh '''
 		sshpass  -p "$remotepassword" scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "."  "$remoteuser@$remotehost:$tomcatDir$BuildName/"'''
