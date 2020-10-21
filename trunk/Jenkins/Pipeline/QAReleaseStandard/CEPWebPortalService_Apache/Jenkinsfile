@@ -40,7 +40,7 @@ node ("$JenkinNodeID")
 		 stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''"$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
+            sudo sh'''"$SonarScannerDir" -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
