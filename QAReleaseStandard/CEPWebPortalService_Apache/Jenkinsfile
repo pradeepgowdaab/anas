@@ -29,7 +29,7 @@ node ("$JenkinNodeID")
 
                   ignoreExternalsOption: true,
 
-                  local: 'Server',
+                  local: '$BuildName',
 
                   remote: '$SCM_checkout']],
 
@@ -78,7 +78,6 @@ node ("$JenkinNodeID")
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
 		sh '''
-		cd server && \
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "$BuildName"  "$remoteuser@$remotehost:$tomcatDir/"'''
         sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
