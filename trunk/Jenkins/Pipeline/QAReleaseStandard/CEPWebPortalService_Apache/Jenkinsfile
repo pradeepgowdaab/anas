@@ -29,7 +29,7 @@ node ("$JenkinNodeID")
 
                   ignoreExternalsOption: true,
 
-                  local: '$BuildName',
+                  local: 'Server',
 
                   remote: '$SCM_checkout']],
 
@@ -41,7 +41,7 @@ node ("$JenkinNodeID")
 		 stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh''' sudo "$sonarscanner" -Dsonar.projectBaseDir=. \
+            sh''' cd server/ && sudo "$sonarscanner" -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
@@ -78,7 +78,7 @@ node ("$JenkinNodeID")
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir$BuildName/"
           echo $Deployment to QA Environment'''
 		sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "$BuildName"  "$remoteuser@$remotehost:$tomcatDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "server/$BuildName"  "$remoteuser@$remotehost:$tomcatDir/"'''
         sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
         echo $Deployment to QA Environment'''
