@@ -71,6 +71,9 @@ node ("$JenkinNodeID")
          stage('Deployment to QA Environment'){
          stage='Deployment to QA Environment'     
          sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "mysqldump -u root -h localhost -p  CEPCitizenPortalDB-ranchi --routines >  /root/$DB-`date +%F`.sql"
+          echo $Deployment to QA Environment'''
+		 sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir/$BuildName/"
           echo $Deployment to QA Environment'''
 		sh '''
