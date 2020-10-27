@@ -50,7 +50,7 @@ node ("$JenkinNodeID") {
              sh ''' 
 			  cordova plugin add https://github.com/jamesla/backgroundvideo.git && \
 			   $CpParam && \
-			 /usr/local/bin/ionic cordova run android --prod|| error=true'''
+			 /usr/local/bin/ionic cordova run android --prod --no-native-run || error=true'''
             }
         
        stage ('Update Nexus Repo Latest Snapshot') {
