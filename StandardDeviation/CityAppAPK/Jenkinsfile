@@ -47,7 +47,9 @@ node ("$JenkinNodeID") {
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh ''' $CpParam && \
+             sh ''' 
+			  cordova plugin add https://github.com/jamesla/backgroundvideo.git && \
+			   $CpParam && \
 			 /usr/local/bin/ionic cordova run android --prod|| error=true'''
             }
         
