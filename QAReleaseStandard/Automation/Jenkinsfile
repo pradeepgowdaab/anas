@@ -11,7 +11,7 @@ pipeline {
         stage('Build and Deploy App') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build '{$TriggerJob}'
+                    build '${TriggerJob}'
                 }
             }
         }
