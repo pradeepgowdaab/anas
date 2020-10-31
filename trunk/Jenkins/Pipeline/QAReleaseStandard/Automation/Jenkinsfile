@@ -3,21 +3,21 @@ pipeline {
     stages {
         stage('Build and Deploy Automation') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build 'Automation'
                 }
             }
         }
         stage('Build and Deploy App') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-                    build "$TriggerJob"
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build '{$TriggerJob}'
                 }
             }
         }
         stage('Zaptesting') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh ''' mkdir -p out && \
                     chmod -R 777 out && \
                     docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
