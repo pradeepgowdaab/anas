@@ -28,8 +28,7 @@ pipeline {
         }
         }
 		post {
-       success
-            {
+       success{
            script {
 		    sh '''cd $Notification_Script 
 			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
@@ -48,6 +47,8 @@ pipeline {
                   echo response.data.toString()
                 }
             }
+			}
+		post {
             failure {
                 script {
 				sh '''cd $Notification_Script 
