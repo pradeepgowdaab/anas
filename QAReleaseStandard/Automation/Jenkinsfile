@@ -47,8 +47,6 @@ pipeline {
                   echo response.data.toString()
                 }
             }
-			}
-		post {
             failure {
                 script {
 				sh '''cd $Notification_Script 
