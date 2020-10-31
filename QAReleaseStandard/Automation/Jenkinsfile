@@ -8,10 +8,10 @@ pipeline {
                 }
             }
         }
-        stage('Build and Deploy $Servicename') {
+        stage('Build and Deploy App') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build '$TriggerJob'
+                    build "$TriggerJob"
                 }
             }
         }
@@ -28,9 +28,9 @@ pipeline {
         }
         }
 		post {
-            success
+       success
             {
-                script {
+           script {
 		    sh '''cd $Notification_Script 
 			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
 		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
