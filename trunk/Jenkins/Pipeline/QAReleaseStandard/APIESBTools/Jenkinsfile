@@ -89,7 +89,7 @@ node ("$JenkinNodeID") {
           stageName = 'Deployment to QA Environment'
 		 finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"
 		 sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "$finalOut"  "$remoteuser@$remotehost:$tomcatDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "${finalOut}"  "$remoteuser@$remotehost:$tomcatDir/"'''
         sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
         echo $Deployment to QA Environment'''
