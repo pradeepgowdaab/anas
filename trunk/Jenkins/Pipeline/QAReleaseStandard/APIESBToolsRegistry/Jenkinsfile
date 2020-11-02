@@ -70,7 +70,7 @@ node ("$JenkinNodeID") {
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
           }
-         echo"$isQGValidationReq"
+                    echo"$isQGValidationReq"
         if("$isQGValidationReq" == 'true')
           stage ('Quality Gate Validation') {
           stageName = 'Quality Gate'
@@ -82,19 +82,6 @@ node ("$JenkinNodeID") {
               }
           }
         }
-		echo"$isDeploymentReq"
-        if("$isDeploymentReq" == 'true')
-        {
-        stage ('Deployment to QA Environment') {
-          stageName = 'Deployment to QA Environment'
-		sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no '"${CAPath}"+'/target/'+"${AppBuildName}"'  "$remoteuser@$remotehost:$tomcatDir/"'''
-        sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
-        echo $Deployment to QA Environment'''
-        }
-        }
-
         if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
@@ -108,7 +95,7 @@ node ("$JenkinNodeID") {
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
