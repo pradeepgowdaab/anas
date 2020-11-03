@@ -35,34 +35,26 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 
-        stage ('npm Dependencies Installation') {
-            stageName = 'npm Dependencies Installation'
-             sh '''
-			 	sudo n $nodejsVersion && \
-				npm rebuild node-sass && \
-			 	npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
-				npm install -D typescript && \
-                npm install'''
+        stage ('Gradle Dependencies Installation') {
+            stageName = 'gradlew Dependencies Installation'
+             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && npm i -g cordova-res --unsafe-perm && ionic cordova resources android --force && \
+			      /usr/local/bin/ionic cordova $ionicparam && \
+				  cp -r build.gradle ./platforms/android/app/  && \
+				  /usr/local/bin/cordova clean android '''
              }
                                  
              
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh '''
-			 npm run ng build "$ngBuildParam" && \
-			 sudo n 10.16.2
-			 '''
+             sh ''' $CpParam && \
+			 /usr/local/bin/ionic cordova run android --prod|| error=true'''
             }
-        stage ('Package Client Libraries') {
-            stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
-            }
+        
+       stage ('Update Nexus Repo Latest Snapshot') {
 
-        stage ('Update Nexus Repo Latest Snapshot') {
-
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
-              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"debug"+'.apk'
+              finalOut = 'platforms/android/app/build/outputs/apk/debug/'+"$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 

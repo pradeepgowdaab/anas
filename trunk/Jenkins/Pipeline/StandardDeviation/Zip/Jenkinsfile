@@ -1,4 +1,5 @@
-node ("$JenkinNodeID") {
+node ("$JenkinNodeID")
+ {
   try {
         stage ('Code Checkout') {
           checkout([
@@ -34,40 +35,26 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
+		  
+         def workspace = env.WORKSPACE
 
-        stage ('npm Dependencies Installation') {
-            stageName = 'npm Dependencies Installation'
-             sh '''
-			 	sudo n $nodejsVersion && \
-				npm rebuild node-sass && \
-			 	npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
-				npm install -D typescript && \
-                npm install'''
-             }
-                                 
-             
-
-        stage ('Complie, Build Client Libraries') {
-            stageName = 'Build Execution'
-             sh '''
-			 npm run ng build "$ngBuildParam" && \
-			 sudo n 10.16.2
-			 '''
-            }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            zip archive: true, dir: "$workspace", glob: '', zipFile: "$BuildName"+'.zip'
             }
-
+        
+          if("$NexusRepoReq" == 'true')
+              {
         stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
-              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
+              }
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
@@ -94,11 +81,10 @@ node ("$JenkinNodeID") {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
                 jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-				}
-				stage ('Finishing: Sitback and Relax')
+              }
+              stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
               }
-				
               }
   }
