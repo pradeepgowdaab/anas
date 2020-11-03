@@ -89,8 +89,10 @@ node ("$JenkinNodeID") {
         {
          stage('Deployment to QA Environment'){
          stage='Deployment to QA Environment'     
+		sh ''' mkdir target2 && \
+		 find -iname '*.jar' -exec cp {} target2/ \\; '''
 		sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target/*.jar"  "$remoteuser@$remotehost:$tomcatDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target2/."  "$remoteuser@$remotehost:$tomcatDir/"'''
         }
         }
         if("$NexusRepoReq" == 'true')
