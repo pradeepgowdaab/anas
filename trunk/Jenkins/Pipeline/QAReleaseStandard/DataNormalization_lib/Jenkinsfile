@@ -80,7 +80,15 @@ node ("$JenkinNodeID") {
               }
           }
         }
-
+     echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+        {
+	   stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+        sh '''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "$CAPath/target/."  "$remoteuser@$remotehost:$tomcatDir/"'''
+        }
+        }
         if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
