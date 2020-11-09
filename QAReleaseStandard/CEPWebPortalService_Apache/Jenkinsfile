@@ -71,7 +71,7 @@ node ("$JenkinNodeID")
          stage('Deployment to QA Environment'){
          stage='Deployment to QA Environment'     
          sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "mysqldump -u $remoteuser -h localhost -p  $DB --routines >  '/root/"$DB-$(date +"%F %T")".sql'"
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "mysqldump -P $DBPort -u --user=$remoteuser -h $DBHost --password=$password  $DB --routines >  '/root/"$DB-$(date +"%F %T")".sql'"
           echo $Deployment to QA Environment'''
 		 sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo mkdir -p $tomcatDir/$BuildName/"
