@@ -232,7 +232,7 @@ node ("$JenkinNodeID") {
                   curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
-                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
+                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}+'\n Refer Static Analysis Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
                       labels: ['Jenkins','BuildSuccess'],
                       assignee: [id: "${JiraDeveloperID}"]]]
