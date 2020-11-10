@@ -73,13 +73,13 @@ node ("$JenkinNodeID") {
           
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''cd client && sudo n $nodejsVersion \
+			sh '''cd client && sudo n $nodejsVersion \
                   npm install && bower install --allow-root \
                   npm install -g $bowerParam \
-                  npm install -g $gulpParam \
-				  npm i \
-                  gulp  \
-                 sudo n latest '''
+                  npm install -g $gulpParam'''
+               sh  'cd client && npm i'
+               sh  'cd client && gulp '
+               sh 'sudo n 10.16.2'
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
