@@ -49,7 +49,7 @@ node ("$JenkinNodeID") {
             stageName = 'Build Execution'
 			 sh 'npm i'
              sh 'gulp'
-             sh 'sudo n latest'			 
+             sh 'sudo n 10.16.2'			 
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
