@@ -191,8 +191,8 @@ node ("$JenkinNodeID") {
           }
 		  echo"$isZaPTestReqWithoutLogin"
         if("$isZaPTestReqWithoutLogin" == 'true')
-		stage ('Intiate Zaptesting') {
-          stageName = 'Intiate Zaptesting'
+		stage ('Initiate Zaptesting') {
+          stageName = 'Initiate Zaptesting'
           sh ''' mkdir -p out && \
                     chmod -R 777 out && \
                     docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
