@@ -164,7 +164,42 @@ node ("$JenkinNodeID") {
           war: '**/*.war'
         }
         }
-        if("$NexusRepoReq" == 'true')
+		echo"$isTestJoBTriggerReq"
+        if("$isTestJoBTriggerReq" == 'true')
+		stage ('Build TestAutomation JOB') {
+          stageName = 'Build TestAutomation JOB'
+          build 'Automation'
+          }
+		  echo"$isTestingReq"
+        if("$isTestingReq" == 'true')
+		stage ('Intiate TestAutomation') {
+          stageName = 'Intiate TestAutomation'
+          sh '''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+          }
+		echo"$isZaPTestReqWithLogin"
+        if("$isZaPTestReqWithLogin" == 'true')
+		stage ('Intiate Zaptesting') {
+          stageName = 'Intiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py \
+                    -z "auth.loginurl=$Applicat_authloginurl \
+                    auth.username="$Application_authusername" auth.password="$Application_authpassword" auth.auto=1" || error=true '''
+          }
+		  echo"$isZaPTestReqWithoutLogin"
+        if("$isZaPTestReqWithoutLogin" == 'true')
+		stage ('Initiate Zaptesting') {
+          stageName = 'Initiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
+          }
+		if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
@@ -189,11 +224,32 @@ node ("$JenkinNodeID") {
           }
               }
           currentBuild.result = 'SUCCESS'
+		  sh '''cd $Notification_Script 
+			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
+		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
+                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
+                      issuetype: [name: 'Task'],
+                      labels: ['Jenkins','BuildSuccess'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
           }
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
+			  sh '''cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+		        sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
+				sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx  
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
                 summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
