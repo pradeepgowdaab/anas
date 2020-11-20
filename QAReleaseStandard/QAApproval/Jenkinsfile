@@ -1,4 +1,4 @@
-node ('$JenkinNodeID') {
+node ("$JenkinNodeID") {
 stage ('Clean workspace') {
 cleanWs()
 }
