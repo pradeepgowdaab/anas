@@ -1,0 +1,12 @@
+node ('$JenkinNodeID') {
+stage ('Clean workspace') {
+cleanWs()
+}
+stage ('Update Nexus Repo Stable Snapshot') {
+sh '''
+curl -u "$NexusUserID":"$NexusUserPass" http://$NexusUrl/repository/$NexusRepoID/QA/latest/$Artifact_Product/$AppBuildName -o $AppBuildName
+curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $AppBuildName http://$NexusUrl/repository/$NexusRepoID/QA/stable/$Artifact_Product/$AppBuildName
+'''
+}
+}
+
