@@ -79,12 +79,12 @@ node ("$JenkinNodeID") {
                   npm install -g $gulpParam'''
                sh  'cd client && npm i'
                sh  'cd client && gulp'
-               sh 'sudo n 10.16.2'
-			   sh '''cd client/release && cat index.html >> index.jsp''' 
+               sh 'sudo n 10.16.2' 
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
             sh '''mv client/release/* Server/src/main/webapp/'''
+			sh '''cd Server/src/main/webapp && cat index.html >> index.jsp'''
              }
 
             def pom = readMavenPom file: "Server/pom.xml"
