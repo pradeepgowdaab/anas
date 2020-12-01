@@ -80,7 +80,7 @@ node ("$JenkinNodeID") {
                sh  'cd client && npm i'
                sh  'cd client && gulp'
                sh 'sudo n 10.16.2'
-			   sh '''cd client/release && cp -r index.html index.jsp''' 
+			   sh '''cd client/release && cat index.html >> index.jsp''' 
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
