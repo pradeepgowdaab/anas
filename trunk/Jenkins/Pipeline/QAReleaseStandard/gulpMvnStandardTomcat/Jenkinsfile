@@ -78,8 +78,9 @@ node ("$JenkinNodeID") {
                   npm install -g $bowerParam \
                   npm install -g $gulpParam'''
                sh  'cd client && npm i'
-               sh  'cd client && gulp '
+               sh  'cd client && gulp'
                sh 'sudo n 10.16.2'
+			   sh '''cd client/release && cp -r index.html index.jsp''' 
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
