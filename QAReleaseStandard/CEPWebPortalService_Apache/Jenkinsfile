@@ -84,12 +84,6 @@ node ("$JenkinNodeID")
 		sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh chmod -R 775 $tomcatDir/$BuildName/"
         echo $Deployment to QA Environment'''
-		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $tomcatDir/$BuildName drush updatedb -y"
-        echo $Deployment to QA Environment'''
-		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $tomcatDir/$BuildName drush cr"
-        echo $Deployment to QA Environment'''
         }
         }
 		echo"$isTestJoBTriggerReq"
