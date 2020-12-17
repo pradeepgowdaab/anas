@@ -82,7 +82,7 @@ node ("$JenkinNodeID")
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
         echo $Deployment to QA Environment'''
 		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo chmode -R 775 $tomcatDir/$BuildName"
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo chmod -R 775 $tomcatDir/$BuildName"
         echo $Deployment to QA Environment'''
 		sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $tomcatDir/$BuildName drush cr"
