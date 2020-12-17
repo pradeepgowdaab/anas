@@ -92,6 +92,10 @@ node ("$JenkinNodeID") {
 		sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID stop"
         echo $Deployment to QA Environment'''
+		sh'sleep 2m'
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID start"
+        echo $Deployment to QA Environment'''
         }
         }
         if("$NexusRepoReq" == 'true')
