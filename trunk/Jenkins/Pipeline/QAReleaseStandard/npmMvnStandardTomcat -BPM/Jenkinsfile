@@ -172,6 +172,7 @@ node ("$JenkinNodeID") {
 		  sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "**/*.war"  "$remoteuser@$remotehost:$tomcatDir/"'''
         }
+		}
 		echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
