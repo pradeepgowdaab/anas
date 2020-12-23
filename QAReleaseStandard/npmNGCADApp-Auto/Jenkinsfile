@@ -130,6 +130,23 @@ node ("$JenkinNodeID")
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
+		  echo"$isReqCodeCoverageUbuntu"
+        if("$isReqCodeCoverageUbuntu" == 'true')
+		  stage('CodeCoverage') {
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/Continuous_Integration/AutomationTesting/cobertura-2.1.1.zip  -o $TomcatPath/cobertura-2.1.1.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip -f $TomcatPath/cobertura-2.1.1.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $TomcatPath/$TomcatFolder/bin/shutdown.sh"'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "/opt/cobertura-2.1.1/cobertura-report.sh --format html --datafile $TomcatPath/$TomcatFolder/bin/cobertura.ser --destination /opt/cobertura-2.1.1/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $TomcatPath/cobertura-2.1.1/$BuildName-Coverage.zip $TomcatPath/cobertura-2.1.1/$BuildName-Coverage"'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u admin:TrInItY123 --upload-file /opt/cobertura-2.1.1/$BuildName-Coverage.zip http://192.168.1.143:8081/repository/$ProjectID/QA/Automation/Nightly/$Artifact_Product/$BuildName-Coverage.zip"'''
+		sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $TomcatPath/$TomcatFolder/bin/catalina.sh start"'''
+            }
           if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
