@@ -10,6 +10,7 @@ pipeline {
         }
         stage('Build and Deploy App') {
             steps {
+			  echo TriggerJob=${TriggerJob}
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build "${TriggerJob}"
                 }
