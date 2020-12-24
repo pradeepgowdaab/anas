@@ -48,9 +48,10 @@ node ("$JenkinNodeID") {
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
-        stage ('Unit test Case Exec') {
+        stage ('Unit test Case Report Exec') {
             stageName = 'Unit test Case ReportExecution'
-            sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file target/site/jacoco/index.html http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.html'
+			sh'zip $BuildName.zip target/site/jacoco/'
+            sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
 
         stage ('Static Code Analysis & Coverage Validation') {
