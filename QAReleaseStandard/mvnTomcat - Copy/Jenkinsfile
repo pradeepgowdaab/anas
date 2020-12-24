@@ -50,7 +50,7 @@ node ("$JenkinNodeID") {
         if("$isUnitTCaseEReportReq" == 'true')
         stage ('Unit test Case Report Exec') {
             stageName = 'Unit test Case ReportExecution'
-			sh'zip $BuildName.zip target/site/jacoco/'
+			sh'zip -r $BuildName.zip target/site/jacoco/'
             sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
 
