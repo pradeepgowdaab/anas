@@ -39,14 +39,14 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
           def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-       	 echo"$isUnitTCaseEReq"
-        if("$isUnitTCaseEReq" == 'true')
+       	 echo"$isUnitTCaseEReportReq"
+        if("$isUnitTCaseEReportReq" == 'true')
         stage ('Unit test Case Exec') {
-            stageName = 'Unit test Case Execution'
+            stageName = 'Unit test Case ReportExecution'
             sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file target/site/jacoco/index.html http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.html'
             }
-			echo"$isUnitTCaseEReportReq"
-        if("$isUnitTCaseEReportReq" == 'true')
+			echo"$isUnitTCaseEReq"
+        if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'isUnitTCaseEReportReq'
             sh 'mvn clean verify $MvnGoal'
