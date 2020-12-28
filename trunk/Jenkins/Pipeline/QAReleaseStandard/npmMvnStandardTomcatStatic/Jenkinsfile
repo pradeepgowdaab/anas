@@ -96,6 +96,13 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'cd Server && mvn clean verify $MvnGoal'
             }
+			echo"$isUnitTCaseEReportReq"
+        if("$isUnitTCaseEReportReq" == 'true')
+        stage ('Unit test Case Report Exec') {
+            stageName = 'Unit test Case ReportExecution'
+			sh'cd Server && zip -r $BuildName.zip target/site/jacoco/'
+            sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
+            }
        stage ('Static Code Analysisfor Client & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
