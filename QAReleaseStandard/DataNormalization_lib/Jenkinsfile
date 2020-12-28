@@ -101,7 +101,7 @@ node ("$JenkinNodeID") {
 		  sh ''' mkdir target2 && \
 		 find -iname '*.nar' -exec cp {} target2/ \\; '''
         sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target2/*.nar"  "$remoteuser@$remotehost:$tomcatDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target2/$BuildName.nar"  "$remoteuser@$remotehost:$tomcatDir/"'''
         }
         }
 		echo"$isTestJoBTriggerReq"
