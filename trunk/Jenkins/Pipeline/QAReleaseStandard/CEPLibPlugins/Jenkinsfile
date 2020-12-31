@@ -117,6 +117,8 @@ node ("$JenkinNodeID") {
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target/$BuildName.jar"  "$remoteuser@$remotehost:$toolingDir/"'''
         }
         }
+		}
+		}
 		echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
