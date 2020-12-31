@@ -106,7 +106,7 @@ node ("$JenkinNodeID")
 		stage ('Intiate TestAutomation') {
           stageName = 'Intiate TestAutomation'
           sh '''
-			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll}" -e async_Result="${async_Result}" -e poll_Result="${poll_Result}" -e Nexusurl="${NexusUrl} -e Product="${BuildName} -e NexusUser="${NexusUserID} -e Password="${NexusUserPass}" -e Project_Build="${Project_Build}" -vvvv'''
           }
 		echo"$isZaPTestReqWithLogin"
         if("$isZaPTestReqWithLogin" == 'true')
@@ -130,22 +130,30 @@ node ("$JenkinNodeID")
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
+		  echo"$isReqCodeCoverageWindows"
+        if("$isReqCodeCoverageWindows" == 'true')
+		stage ('Initiate CodeCoverage') {
+          stageName = 'Initiate CodeCoverage'
+          sh '''/usr/bin/ansible-playbook -i $hostspathCodeCoverageReport $ansibleplaybookCodeCoverageReport --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e drive="${drive}" -e Codecoverage="${Codecoverage}" -e zip="${zip}" -e Service="${Service}" -e TomcatPath="${TomcatPath}" -e Nexusurl="${NexusUrl}" -e NexusRepoID="${NexusRepoID}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Env="${Env}" -e BuildName="${BuildName}" -e ModeofOperation="${ModeofOperation}" -vvvv'''
+          }
 		  echo"$isReqCodeCoverageUbuntu"
         if("$isReqCodeCoverageUbuntu" == 'true')
 		  stage('CodeCoverage') {
-          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/Continuous_Integration/AutomationTesting/cobertura-2.1.1.zip  -o $TomcatPath/cobertura-2.1.1.zip"'''
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip -f $TomcatPath/cobertura-2.1.1.zip"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip -f $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $TomcatPath/$TomcatFolder/bin/shutdown.sh"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/shutdown.sh"'''
 		 sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "/opt/cobertura-2.1.1/cobertura-report.sh --format html --datafile $TomcatPath/$TomcatFolder/bin/cobertura.ser --destination /opt/cobertura-2.1.1/$BuildName-Coverage [JAVA-SOURCE]"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh sleep 1m"'''
 		 sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $TomcatPath/cobertura-2.1.1/$BuildName-Coverage.zip $TomcatPath/cobertura-2.1.1/$BuildName-Coverage"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "/opt/$zip/cobertura-report.sh --format html --datafile $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/cobertura.ser --destination /opt/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
 		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u admin:TrInItY123 --upload-file /opt/cobertura-2.1.1/$BuildName-Coverage.zip http://192.168.1.143:8081/repository/$ProjectID/QA/Automation/Nightly/$Artifact_Product/$BuildName-Coverage.zip"'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file /opt/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
 		sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $TomcatPath/$TomcatFolder/bin/catalina.sh start"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/catalina.sh start"'''
             }
           if("$NexusRepoReq" == 'true')
               {
