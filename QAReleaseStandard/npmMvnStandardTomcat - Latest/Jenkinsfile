@@ -217,7 +217,7 @@ node ("$JenkinNodeID") {
 		  stage('CodeCoverage') {
           sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
 		  sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/shutdown.sh"'''
 		 sh'''sleep 1m'''
