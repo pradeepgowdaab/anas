@@ -221,7 +221,7 @@ node ("$JenkinNodeID") {
 		  sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/shutdown.sh"'''
 		 sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh sleep 1m"'''
+         sh sleep 1m'''
 		 sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "/opt/$zip/cobertura-report.sh --format html --datafile $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/cobertura.ser --destination /opt/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
 		 sh'''
