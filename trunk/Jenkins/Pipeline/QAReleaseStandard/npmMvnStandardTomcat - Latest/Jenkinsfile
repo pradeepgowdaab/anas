@@ -212,14 +212,14 @@ node ("$JenkinNodeID") {
           stageName = 'Initiate CodeCoverage'
           sh '''/usr/bin/ansible-playbook -i $hostspathCodeCoverageReport $ansibleplaybookCodeCoverageReport --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e drive="${drive}" -e Codecoverage="${Codecoverage}" -e zip="${zip}" -e Service="${Service}" -e TomcatPath="${TomcatPath}" -e Nexusurl="${NexusUrl}" -e NexusRepoID="${NexusRepoID}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Env="${Env}" -e BuildName="${BuildName}" -e ModeofOperation="${ModeofOperation}" -vvvv'''
           }
-		  echo"$isReqCodeCoverageUbuntu"
+		 echo"$isReqCodeCoverageUbuntu"
         if("$isReqCodeCoverageUbuntu" == 'true')
 		  stage('CodeCoverage') {
           sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip -f $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/shutdown.sh"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/shutdown.sh"'''
 		 sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh sleep 1m"'''
 		 sh'''
@@ -227,9 +227,9 @@ node ("$JenkinNodeID") {
 		 sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
 		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u admin:TrInItY123 --upload-file /opt/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/CodeCoverageReport/$BuildName/$BuildName.zip"'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file /opt/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
 		sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/catalina.sh start"'''
             }
         if("$NexusRepoReq" == 'true')
               {
