@@ -154,7 +154,7 @@ node ("$JenkinNodeID")
 		sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
 		sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/catalina.sh start"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
             }
           if("$NexusRepoReq" == 'true')
               {
