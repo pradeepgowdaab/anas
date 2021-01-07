@@ -148,7 +148,7 @@ node ("$JenkinNodeID")
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $UbuntuTomcatFolder/bin/shutdown.sh"'''
 		 sh'''sleep 1m'''
 		 sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "/opt/$zip/cobertura-report.sh --format html --datafile $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/cobertura.ser --destination /opt/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "$ubuntucoberturaPath/$zip/cobertura-report.sh --format html --datafile $UbuntuTomcatFolder/bin/cobertura.ser --destination $ubuntucoberturaPath/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
 		 sh'''
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
 		sh'''
