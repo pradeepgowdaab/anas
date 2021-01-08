@@ -75,7 +75,7 @@ node ("$JenkinNodeID") {
             stageName = 'npm Dependencies Installation'
             sh '''cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
-                  npm install && /usr/local/bin/node $max_old_space_size node_modules/@angular/cli/bin/ng build --aot --configuration=production'''
+                  npm install && /usr/local/bin/node max_old_space_size=$max_old_space_size node_modules/@angular/cli/bin/ng build --aot --configuration=production'''
              }
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
