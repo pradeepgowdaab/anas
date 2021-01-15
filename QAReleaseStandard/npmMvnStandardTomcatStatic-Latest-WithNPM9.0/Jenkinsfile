@@ -215,6 +215,7 @@ node ("$JenkinNodeID") {
 		 echo"$isReqCodeCoverageUbuntuWithTomcatDir"
         if("$isReqCodeCoverageUbuntuWithTomcatDir" == 'true')
 		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
           sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
@@ -235,6 +236,7 @@ node ("$JenkinNodeID") {
 			echo"$isReqCodeCoverageUbuntuWithUserDir"
         if("$isReqCodeCoverageUbuntuWithUserDir" == 'true')
 		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
           sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
