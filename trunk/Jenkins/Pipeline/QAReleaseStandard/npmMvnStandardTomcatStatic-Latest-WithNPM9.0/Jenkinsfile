@@ -315,7 +315,7 @@ node ("$JenkinNodeID") {
                       summary:  "${summarymsg}",
                       description: "${descriptionmsg}",
                       issuetype: [name: 'Bug'],
-                      assignee: [id: "${JiraDeveloperID}"]]]
+                      assignee: [id: "${JiraQAOwnerID}"]]]
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
