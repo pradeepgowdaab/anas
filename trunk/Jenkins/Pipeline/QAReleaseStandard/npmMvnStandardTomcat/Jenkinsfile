@@ -244,7 +244,7 @@ node ("$JenkinNodeID") {
                       description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
                       labels: ['Jenkins','BuildSuccess'],
-                      assignee: [id: "${JiraDeveloperID}"]]]
+                      assignee: [id: "${JiraQAOwnerID}"]]]
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
