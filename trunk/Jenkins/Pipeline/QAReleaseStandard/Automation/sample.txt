@@ -1,0 +1,84 @@
+pipeline {
+    agent { label 'master' }
+    stages {
+        stage('Build and Deploy Automation') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build 'Automation'
+                }
+            }
+        }
+        stage('Build and Deploy NGCADApp') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build 'trinityIoT-RnD_IOTOPS_IoTOpsService_Nightly'
+                }
+            }
+        }
+		stage('Build and Deploy NGCADNotificationService') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build 'trinityIoT-RnD_IOTOPS_IoTOpsNotificationService_Nightly'
+                }
+            }
+        }
+        stage('Test Automation') {
+            steps {
+                    sh '''
+					/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${Nexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+            }
+        }
+		stage('Zaptesting') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py \
+                    -z "auth.loginurl=$Applicat_authloginurl \
+                    auth.username="$Application_authusername" auth.password="$Application_authpassword" auth.auto=1" || error=true '''
+            }
+			}
+        }
+        }
+		post {
+            success
+            {
+                script {
+		    sh '$Notification_Script'
+		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url'
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
+                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
+                      issuetype: [name: 'Task'],
+                      labels: ['Jenkins','BuildSuccess'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+                }
+            }
+            failure {
+                script {
+				sh '$FailNotification_Script'
+		        sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url'
+				sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar && \
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx  && \
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  'Application Build '+"${BuildName}"+' & QA Deployment failed',
+                      description: 'Application is Deployment Failure , \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
+                      issuetype: [name: 'Bug'],
+                      labels: ['Jenkins','BuildFailure'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+                }
+            }
+        }
+}
