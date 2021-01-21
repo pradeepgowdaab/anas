@@ -71,7 +71,7 @@ node ("$JenkinNodeID")
           stage ('Creating Virtual Env') {
             stageName = 'Creating Virtual Env'
   //this Env should create outside checkout folder
-            sh 'cd .. && alias python=python3'
+            sh 'alias python=python3'
             sh 'apt-get install python-virtualenv'   
             sh 'python3 -m venv Env'             
             sh '. Env/bin/activate' 
