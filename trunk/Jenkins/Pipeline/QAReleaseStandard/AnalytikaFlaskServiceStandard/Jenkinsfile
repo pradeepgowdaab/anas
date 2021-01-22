@@ -46,7 +46,7 @@ node ("$JenkinNodeID")
             sh 'alias python=python3 && cd $BuildName && apt install python-pip'            
             sh 'alias python=python3 && cd $BuildName && pip install -r requirements.txt'
             sh 'alias python=python3 && cd $BuildName && pip install pytest-cov'
-            sh 'cd $BuildName && pip install pytest-xdist'
+            sh 'alias python=python3 && cd $BuildName && pip install pytest-xdist'
             }
             }
           stage ('Unit testing') {
