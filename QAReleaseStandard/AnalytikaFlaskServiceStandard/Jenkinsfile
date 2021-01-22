@@ -54,7 +54,7 @@ node ("$JenkinNodeID")
              sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test || error=true'
              sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test --cov-report xml'
              sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test --cov-report html'
-            // sh 'alias python=python3 && cd $BuildName && /opt/jenkins/workspace/RnD-trinityIoT-ANALYTIKA/trinityIoT-MLComposer_AnalytikaFlaskService_nightly/Env/bin/python -m pytest --cov=/ unit_test || error=true'
+            // sh 'alias python=python3 && cd $BuildName && Env/bin/python -m pytest --cov=/ unit_test || error=true'
             }
             echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
