@@ -40,10 +40,9 @@ node ("$JenkinNodeID")
              {
           stage ('Creating Virtual Env') {
             stageName = 'Creating Virtual Env'
-            sh 'alias python=python3'
-            sh 'apt-get install python-virtualenv'   
-            sh 'python3 -m venv Env'             
-            sh '. Env/bin/activate'            
+            sh 'alias python=python3 && apt-get install python-virtualenv'   
+            sh 'alias python=python3 && python3 -m venv Env'             
+            sh 'alias python=python3 && . Env/bin/activate'            
             sh 'alias python=python3 && cd $BuildName && apt install python-pip'            
             sh 'alias python=python3 && cd $BuildName && pip install -r requirements.txt'
             sh 'alias python=python3 && cd $BuildName && pip install pytest-cov'
@@ -54,7 +53,7 @@ node ("$JenkinNodeID")
              stageName = 'Unit test Case Execution'
              //sh 'cd $BuildName && apt install python-pip'
              //sh 'pip install pytest-cov && pip install pytest-xdist'
-             sh 'alias python=python3 && cd $BuildName &&  pytest --cov=/ unit_test || error=true'
+             sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test || error=true'
              sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test --cov-report xml'
              sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test --cov-report html'
              //sh 'cd $BuildName && apt install python-pip'
