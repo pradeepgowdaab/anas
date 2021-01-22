@@ -45,9 +45,9 @@ node ("$JenkinNodeID")
             sh 'python3 -m venv Env'             
             sh '. Env/bin/activate'            
             sh 'cd $BuildName && apt install python-pip'            
-            sh 'cd $BuildName pip install -r requirements.txt'
-            sh 'cd $BuildName pip install pytest-cov'
-            sh 'cd $BuildName pip install pytest-xdist'
+            sh 'cd $BuildName && pip install -r requirements.txt'
+            sh 'cd $BuildName && pip install pytest-cov'
+            sh 'cd $BuildName && pip install pytest-xdist'
             }
             }
           stage ('Unit testing') {
@@ -59,7 +59,7 @@ node ("$JenkinNodeID")
              sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test --cov-report html'
              //sh 'cd $BuildName && apt install python-pip'
              //sh 'pip install pytest-cov && pip install pytest-xdist'
-             sh 'alias python=python3 && cd $BuildName &&  pytest --cov=/ unit_test || error=true'
+             sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test || error=true'
              sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test --cov-report xml'
              sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test --cov-report html'
 			 sh 'alias python=python3 && cd $BuildName && pytest --cov=/ unit_test || error=true'
