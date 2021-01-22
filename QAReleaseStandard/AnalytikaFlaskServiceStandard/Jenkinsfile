@@ -52,7 +52,7 @@ node ("$JenkinNodeID")
             }
           stage ('Unit testing') {
              stageName = 'Unit test Case Execution'
-             sh 'cd $BuildName &&  pytest --cov=/ unit_test || error=true'
+             sh 'cd $BuildName && /opt/jenkins/workspace/RnD-trinityIoT-ANALYTIKA/trinityIoT-MLComposer_AnalytikaFlaskService_nightly/Env/bin/python -m pytest --cov=/ unit_test || error=true'
              sh 'cd $BuildName && pytest --cov=/ unit_test --cov-report xml'
              sh 'cd $BuildName && pytest --cov=/ unit_test --cov-report html'
             }
