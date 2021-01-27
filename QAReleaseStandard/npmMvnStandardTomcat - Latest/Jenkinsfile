@@ -171,6 +171,12 @@ node ("$JenkinNodeID") {
           war: '**/*.war'
         }
         }
+		echo"$isRMReqCodeCoverageUbuntuUserDir"
+        if("$isRMReqCodeCoverageUbuntuUserDir" == 'true')
+		  stage('CodeCoverageUbuntuUserDir') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "rm -r /root/cobertura.ser"'''
+		  }
 		echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
@@ -212,12 +218,7 @@ node ("$JenkinNodeID") {
           stageName = 'Initiate CodeCoverage'
           sh '''/usr/bin/ansible-playbook -i $hostspathCodeCoverageReport $ansibleplaybookCodeCoverageReport --e TargetMachine="${WCoverageTargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e drive="${drive}" -e Codecoverage="${Codecoverage}" -e zip="${zip}" -e Service="${Service}" -e TomcatPath="${TomcatPath}" -e Nexusurl="${NexusUrl}" -e NexusRepoID="${NexusRepoID}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Env="${Env}" -e BuildName="${BuildName}" -e ModeofOperation="${ModeofOperation}" -vvvv'''
           }
-		  echo"$isRMReqCodeCoverageUbuntuUserDir"
-        if("$isRMReqCodeCoverageUbuntuUserDir" == 'true')
-		  stage('CodeCoverageUbuntuUserDir') {
-		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
-          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "rm -r /root/cobertura.ser"'''
-		  }
+		  
 		 echo"$isReqCodeCoverageUbuntuWithTomcatDir"
         if("$isReqCodeCoverageUbuntuWithTomcatDir" == 'true')
 		  stage('CodeCoverage') {
