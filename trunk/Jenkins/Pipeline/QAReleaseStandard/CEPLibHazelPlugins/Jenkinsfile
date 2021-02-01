@@ -47,7 +47,7 @@ node ("$JenkinNodeID") {
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'isUnitTCaseEReportReq'
-            sh 'cd ${CAPath} && mvn clean verify $MvnGoal'
+            sh 'cd $CAPath && mvn clean verify $MvnGoal'
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
