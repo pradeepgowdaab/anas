@@ -37,10 +37,10 @@ node ("$JenkinNodeID") {
           }
 		 def Path = 'trinityAEP'
          def pom = readMavenPom file: "${Path}/pom.xml"
-		  def  artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()
-          def   packaging = readMavenPom().getPackaging()
-          def  AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+		 def artifact = readMavenPom().getArtifactId()
+         def VERSION = readMavenPom().getVersion()
+         def packaging = readMavenPom().getPackaging()
+         def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
