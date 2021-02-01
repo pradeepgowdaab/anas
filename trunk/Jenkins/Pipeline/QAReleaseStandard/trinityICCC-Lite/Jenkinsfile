@@ -132,8 +132,8 @@ node ("$JenkinNodeID") {
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
-		 def Path = 'AEPPlugins/wflow-plugin-archetype'
-         def pom = readMavenPom file: "${Path}/pom.xml
+		 def JarPath = 'AEPPlugins/wflow-plugin-archetype'
+         def pom = readMavenPom file: "${JarPath}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
@@ -163,8 +163,8 @@ node ("$JenkinNodeID") {
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
           }
-		 def Path = 'jw-community/wflow-app'
-         def pom = readMavenPom file: "${Path}/pom.xml"
+		 def WarPath = 'jw-community/wflow-app'
+         def pom = readMavenPom file: "${WarPath}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
