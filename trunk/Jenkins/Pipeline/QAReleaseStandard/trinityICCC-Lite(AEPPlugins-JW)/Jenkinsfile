@@ -35,8 +35,8 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-		 def Path = "wflow-app"
-         def pom = readMavenPom file: "${Path}/pom.xml"
+		  def Path = 'wflow-app'
+          def pom = readMavenPom file: "${Path}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
