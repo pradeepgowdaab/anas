@@ -97,7 +97,7 @@ node ("$JenkinNodeID") {
 		   sh 'cd AEPPlugins/wflow-plugin-archetype/trinityAEP && mvn clean install -Dmaven.test.skip=true'
 		   
 		   }  
-echo"$isTestJoBTriggerReq"
+      echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
           stageName = 'Build TestAutomation JOB'
@@ -132,8 +132,8 @@ echo"$isTestJoBTriggerReq"
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
-		 def JarPath = 'AEPPlugins/wflow-plugin-archetype'
-         def pom = readMavenPom file: "${JarPath}/pom.xml
+		 def Path = 'AEPPlugins/wflow-plugin-archetype'
+         def pom = readMavenPom file: "${Path}/pom.xml
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
@@ -163,8 +163,8 @@ echo"$isTestJoBTriggerReq"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
           }
-		 def WarPath = 'jw-community/wflow-app'
-         def pom = readMavenPom file: "${WarPath}/pom.xml"
+		 def Path = 'jw-community/wflow-app'
+         def pom = readMavenPom file: "${Path}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
