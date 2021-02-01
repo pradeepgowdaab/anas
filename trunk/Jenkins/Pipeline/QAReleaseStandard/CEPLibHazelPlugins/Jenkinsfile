@@ -47,18 +47,18 @@ node ("$JenkinNodeID") {
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'isUnitTCaseEReportReq'
-            sh 'cd $CAPath && mvn clean verify $MvnGoal'
+            sh 'cd component && mvn clean verify $MvnGoal'
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
         stage ('Unit test Case Report Exec') {
             stageName = 'Unit test Case ReportExecution'
-			sh'zip -r $BuildName.zip ${CAPath}/target/site/jacoco/'
+			sh'zip -r $BuildName.zip component/target/site/jacoco/'
             sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install'
+          sh 'cd component && /usr/lib/maven354/bin/mvn clean install'
           }
 
           stage ('Static Code Analysis & Coverage Validation') {
@@ -78,7 +78,7 @@ node ("$JenkinNodeID") {
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=${CAPath}/target/site/jacoco/jacoco.xml'''
+            -Dsonar.cobertura.reportPath=component/target/site/jacoco/jacoco.xml'''
           }
           }
 
@@ -98,7 +98,7 @@ node ("$JenkinNodeID") {
 	   stage ('Deployment to QA Environment hazelcast') {
           stageName = 'Deployment to QA Environment hazelcast'
 		  sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "${CAPath}/target/$BuildName.jar"  "$remoteuser@$remotehost:$hazelcastDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$hazelcastDir/"'''
         }
 		echo"$isDeploymentReqstreaming"
         if("$isDeploymentReqstreaming" == 'true')
@@ -106,7 +106,7 @@ node ("$JenkinNodeID") {
 	   stage ('Deployment to QA Environment streaming') {
           stageName = 'Deployment to QA Environment streaming'
         sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "${CAPath}/target/$BuildName.jar"  "$remoteuser@$remotehost:$streamingDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$streamingDir/"'''
         }
 		echo"$isDeploymentReqtooling"
         if("$isDeploymentReqtooling" == 'true')
@@ -114,7 +114,7 @@ node ("$JenkinNodeID") {
 	   stage ('Deployment to QA Environment tooling') {
           stageName = 'Deployment to QA Environment tooling'
         sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "${CAPath}/target/$BuildName.jar"  "$remoteuser@$remotehost:$toolingDir/"'''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$toolingDir/"'''
         }
         }
 		}
