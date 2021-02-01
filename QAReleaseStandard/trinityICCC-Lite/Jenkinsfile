@@ -63,10 +63,10 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=AEPPlugins/wflow-plugin-archetype/target/classes \
-            -Dsonar.junit.reportsPath=AEPPlugins/wflow-plugin-archetype/target/surefire-reports \
-            -Dsonar.jacoco.reportPath=AEPPlugins/wflow-plugin-archetype/target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=AEPPlugins/wflow-plugin-archetype/target/site/jacoco/jacoco.xml'''
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=trinityAEP/target/surefire-reports \
+            -Dsonar.jacoco.reportPath=trinityAEP/target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=trinityAEP/target/site/jacoco/jacoco.xml'''
           }
           }
 		  echo"$isQGValidationReq"
