@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'mvn clean verify $MvnGoal'
+            sh 'cd trinityAEP && mvn clean verify $MvnGoal'
             }
 			
 		  stage ('Static Code Analysis & Coverage Validation') {
@@ -63,7 +63,7 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=target/classes \
+            -Dsonar.java.binaries=trinityAEP/target/classes \
             -Dsonar.junit.reportsPath=trinityAEP/target/surefire-reports \
             -Dsonar.jacoco.reportPath=trinityAEP/target/jacoco.exec \
             -Dsonar.cobertura.reportPath=trinityAEP/target/site/jacoco/jacoco.xml'''
