@@ -35,7 +35,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-		 def Path = 'AEPPlugins/wflow-plugin-archetype'
+		 def Path = 'AEPPlugins/wflow-plugin-archetype/'
          def pom = readMavenPom file: "${Path}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
@@ -140,12 +140,14 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
+			  sh 'cd jw-community/wflow-consoleweb/target'
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
               {
+			  sh 'cd jw-community/wflow-consoleweb/target'
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
