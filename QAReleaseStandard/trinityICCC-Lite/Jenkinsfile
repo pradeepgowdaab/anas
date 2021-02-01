@@ -163,6 +163,7 @@ node ("$JenkinNodeID") {
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
           }
+		  }
 		 def WarPath = 'jw-community/wflow-app'
          def pom = readMavenPom file: "${WarPath}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
