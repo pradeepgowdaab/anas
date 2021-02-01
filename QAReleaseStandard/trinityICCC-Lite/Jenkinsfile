@@ -35,13 +35,18 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
+		 def Path = 'AEPPlugins/wflow-plugin-archetype'
+         def pom = readMavenPom file: "${Path}/pom.xml"
+		  def  artifact = readMavenPom().getArtifactId()
+          def    VERSION = readMavenPom().getVersion()
+          def   packaging = readMavenPom().getPackaging()
+          def  AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
             sh 'cd AEPPlugins/wflow-plugin-archetype && mvn clean verify $MvnGoal'
-			sh 'cd jw-community/wflow-app && mvn clean verify $MvnGoal'
             }
 			
 		  stage ('Static Code Analysis & Coverage Validation') {
@@ -58,10 +63,10 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+            -Dsonar.java.binaries=AEPPlugins/wflow-plugin-archetype/target/classes \
+            -Dsonar.junit.reportsPath=AEPPlugins/wflow-plugin-archetype/target/surefire-reports \
+            -Dsonar.jacoco.reportPath=AEPPlugins/wflow-plugin-archetype/target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=AEPPlugins/wflow-plugin-archetype/target/site/jacoco/jacoco.xml'''
           }
           }
 		  echo"$isQGValidationReq"
@@ -76,10 +81,11 @@ node ("$JenkinNodeID") {
               }
           }
         }
-		stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-          sh 'cd jw-community/wflow-app && mvn clean install -Dmaven.test.skip=true'
-          }       
+		   stage ('Application Build Packaging')
+		   {
+		   sh 'cd AEPPlugins/wflow-plugin-archetype/trinityAEP && mvn clean install -Dmaven.test.skip=true'
+		   
+		   }        
            echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
@@ -92,11 +98,7 @@ node ("$JenkinNodeID") {
           war: '**/*.war'
          }
         }
-        stage ('AEP jar generation')
-		   {
-		   sh 'cd AEPPlugins/wflow-plugin-archetype/trinityAEP && mvn clean install -Dmaven.test.skip=true'
-		   
-		   }  
+
       echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
@@ -132,69 +134,27 @@ node ("$JenkinNodeID") {
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
-		 def JarPath = 'AEPPlugins/wflow-plugin-archetype'
-         def pom = readMavenPom file: "${JarPath}/pom.xml"
-		  def  artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()
-          def   packaging = readMavenPom().getPackaging()
-          def  JarAppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-        if("$AEPNexusRepoReq" == 'true')
-         {
-        stage ('Update Nexus Repo Latest Snapshot') {
-              if("$BuildWithVerNo" == 'true')
-              {
-			  sh 'cd AEPPlugins/wflow-plugin-archetype'
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${JarAppBuildName}"
-              finalOut = {$JarPath}+'target/'+"${JarAppBuildName}"+' '+"${nexustarget}"
-              echo "${JarAppBuildName}"
-              echo "${nexustarget}"
-              echo "${finalOut}"
-              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
-              }
-              else
-              {
-			  sh 'cd AEPPlugins/wflow-plugin-archetype'
-              JarAppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${JarAppBuildName}"
-              finalOut = 'target/'+"${JarAppBuildName}"+' '+"${nexustarget}"
-              echo "${JarAppBuildName}"
-              echo "${nexustarget}"
-              echo "${finalOut}"
-              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
-              }
-          }
-		  }
-		 def WarPath = 'jw-community/wflow-app'
-         def pom = readMavenPom file: "${WarPath}/pom.xml"
-		  def  artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()
-          def   packaging = readMavenPom().getPackaging()
-		  def  WarAppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-		  if("$jwNexusRepoReq" == 'true')
+
+        if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
-              if("$BuildWithVerNo" == 'true')
+            if("$BuildWithVerNo" == 'true')
               {
-			  sh 'cd jw-community/wflow-consoleweb/target'
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${WarAppBuildName}"
-              finalOut = 'target/'+"${WarAppBuildName}"+' '+"${nexustarget}"
-              echo "${WarAppBuildName}"
-              echo "${nexustarget}"
-              echo "${finalOut}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
-              }
-              else
-              {
-			  sh 'cd jw-community/wflow-consoleweb/target'
-              WarAppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${WarAppBuildName}"
-              finalOut = 'target/'+"${WarAppBuildName}"+' '+"${nexustarget}"
-              echo "${WarAppBuildName}"
-              echo "${nexustarget}"
-              echo "${finalOut}"
-              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
-              }
           }
+          else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+        }
               }
           currentBuild.result = 'SUCCESS'
 		  sh '''
