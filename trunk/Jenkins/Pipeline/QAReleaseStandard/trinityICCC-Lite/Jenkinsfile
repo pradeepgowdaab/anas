@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'cd AEPPlugins/wflow-plugin-archetype && mvn clean verify $MvnGoal'
+            sh 'mvn clean verify $MvnGoal'
             }
 			
 		  stage ('Static Code Analysis & Coverage Validation') {
@@ -83,13 +83,13 @@ node ("$JenkinNodeID") {
         }
 		   stage ('Application Build Packaging')
 		   {
-		   sh 'cd AEPPlugins/wflow-plugin-archetype/trinityAEP && mvn clean install -Dmaven.test.skip=true'
+		   sh 'cd trinityAEP && mvn clean install -Dmaven.test.skip=true'
 		   
 		   }        
            echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
-		sh 'cd jw-community/wflow-consoleweb/target'
+		sh 'cd trinityAEP/target'
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
           deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
@@ -140,14 +140,12 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
-			  sh 'cd jw-community/wflow-consoleweb/target'
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
               {
-			  sh 'cd jw-community/wflow-consoleweb/target'
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
