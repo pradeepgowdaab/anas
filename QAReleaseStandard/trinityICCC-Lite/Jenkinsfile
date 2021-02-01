@@ -35,7 +35,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-		 def Path = 'AEPPlugins/wflow-plugin-archetype/trinityAEP'
+		 def Path = 'trinityAEP'
          def pom = readMavenPom file: "${Path}/pom.xml"
 		  def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
