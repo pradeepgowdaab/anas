@@ -290,28 +290,11 @@ node ("$JenkinNodeID") {
           }
               }
           currentBuild.result = 'SUCCESS'
-		  sh '''
-		  export ANSIBLE_HOST_KEY_CHECKING=False
-		  cd $Notification_Script 
-			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
-                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
-                      summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
-                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
-                      issuetype: [name: 'Task'],
-                      labels: ['Jenkins','BuildSuccess'],
-                      assignee: [id: "${JiraQAOwnerID}"]]]
-                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
-                  echo response.successful.toString()
-                  echo response.data.toString()
           }
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-			  sh '''
-			  export ANSIBLE_HOST_KEY_CHECKING=False
-			  cd $Notification_Script 
-				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
                 summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
