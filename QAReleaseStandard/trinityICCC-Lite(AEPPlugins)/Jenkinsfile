@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
 		 def artifact = readMavenPom().getArtifactId()
          def VERSION = readMavenPom().getVersion()
          def packaging = readMavenPom().getPackaging()
-         def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+         //def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
@@ -141,7 +141,7 @@ node ("$JenkinNodeID") {
             if("$BuildWithVerNo" == 'true')
               {
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = 'cd ${Path}/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = "${Path}"+'/target/**/*.jar'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
