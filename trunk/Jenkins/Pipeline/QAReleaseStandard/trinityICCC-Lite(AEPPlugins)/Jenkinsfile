@@ -141,7 +141,7 @@ node ("$JenkinNodeID") {
             if("$BuildWithVerNo" == 'true')
               {
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = "${Path}"+'/target/.jar'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = "${Path}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
