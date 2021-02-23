@@ -40,21 +40,23 @@ node ("$JenkinNodeID")
              {
           stage ('Creating Virtual Env') {
             stageName = 'Creating Virtual Env'
-            sh 'alias python=python3 && apt-get install python-virtualenv'   
-            sh 'alias python=python3 && python3 -m venv Env'             
-            sh 'alias python=python3 && . Env/bin/activate'            
-            sh 'cd $BuildName && alias python=python3 &&  apt install python-pip'            
-            sh 'cd $BuildName && alias python=python3 && python -V && pip install cmake && pip install -r requirements.txt'
-            sh 'cd $BuildName && alias python=python3 && pip install pytest-cov'
-            sh 'cd $BuildName && alias python=python3 && pip install pytest-xdist'
+            sh 'apt-get install python-virtualenv'   
+            sh 'python3 -m venv Env'             
+            sh '. Env/bin/activate'            
+            sh 'cd $BuildName && apt install python-pip'            
+            sh 'cd $BuildName && pip install cmake && pip install -r requirements.txt'
+            sh 'cd $BuildName && pip install coverage'
             }
             }
           stage ('Unit testing') {
              stageName = 'Unit test Case Execution'
-             sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test || error=true'
-             sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test --cov-report xml'
-             sh 'cd $BuildName && alias python=python3 && pytest --cov=/ unit_test --cov-report html'
-            // sh 'alias python=python3 && cd $BuildName && Env/bin/python -m pytest --cov=/ unit_test || error=true'
+			 //sh 'cd $BuildName/analytika && coverage run main.py'
+			 //sh 'cd $BuildName/analytika && coverage run test_unittest.py'
+			 //sh 'cd $BuildName/analytika && pytest test_pytest.py'
+			 //sh 'cd $BuildName/analytika && coverage run test_unittest.py && coverage run test_pytest.py'
+			 sh 'cd $BuildName/analytika && pytest --cov=unit_test'
+			 //sh 'cd $Buildname && coverage report -m'
+             sh 'cd $BuildName && coverage xml && coverage html'
             }
             echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
@@ -78,8 +80,8 @@ node ("$JenkinNodeID")
             -Dsonar.scm.provider=svn \
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
-            -Dsonar.python.coverage.reportPaths=coverage.xml \
-            -Dsonar.python.xunit.reportPath=pytest-report.xml \
+            -Dsonar.python.coverage.reportPaths=$BuildName/coverage.xml \
+            -Dsonar.python.xunit.reportPath=$BuildName/coverage.xml \
             -Dsonar.exclusions="$sonarexclusions"'''
           }
           }
