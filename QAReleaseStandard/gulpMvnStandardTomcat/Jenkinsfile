@@ -223,7 +223,7 @@ node ("$JenkinNodeID") {
 		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
           sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
 		  sh'''
-         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d $ubuntucoberturaPath/"'''
 		 sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "chmod -R 777 $ubuntucoberturaPath/$zip"'''
 		  sh'''
