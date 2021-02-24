@@ -54,7 +54,7 @@ node ("$JenkinNodeID")
 			 //sh 'cd $BuildName/analytika && coverage run test_unittest.py'
 			 //sh 'cd $BuildName/analytika && pytest test_pytest.py'
 			 //sh 'cd $BuildName/analytika && coverage run test_unittest.py && coverage run test_pytest.py'
-			 sh 'cd $BuildName  && pytest --cov=unit_test'
+			 sh 'cd $BuildName  && pytest --cov=analytika'
 			 //sh 'cd $Buildname && coverage report -m'
              sh 'cd $BuildName && coverage xml && coverage html'
             }
