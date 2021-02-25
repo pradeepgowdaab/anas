@@ -1,6 +1,6 @@
 properties([
   parameters([
-    string(name: 'RV', defaultValue: '', description: 'The Stable environment', )
+    string(name: 'RV', description: 'The Stable environment', )
    ])
 ])
 node ("$JenkinNodeID") {
