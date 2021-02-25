@@ -78,6 +78,8 @@ node ("$JenkinNodeID") {
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
 			-Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
 		    -Dsonar.dependencyCheck.securityHotspot=true \
+			-Dsonar.dependencyCheck.summarize=true \
+			-Dsonar.dependencyCheck.skip=false \
             -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
           }
           }
