@@ -107,7 +107,7 @@ node ("$JenkinNodeID") {
         {
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
-          wildfly-deployer: [jboss7(credentialsId: "Wildfly", 
+          deploy adapters: [jboss7(credentialsId: "Wildfly", 
           url: "$tomcatUrl")],
           contextPath: "$contextPath",
           war: '**/*.war'
