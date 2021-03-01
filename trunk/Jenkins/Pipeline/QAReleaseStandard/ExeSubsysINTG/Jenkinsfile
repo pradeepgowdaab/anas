@@ -1,0 +1,57 @@
+node ("WindowsAgent")
+ {
+ stage ('Code Checkout') {
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+	stage ('MSBuild')
+	{
+                 echo 'Building..'
+                 "C:\\Program files (x86)\\Microsoft visual studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe\""
+                 
+                    }
+                def workspace = env.WORKSPACE
+
+        stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: "$workspace", glob: '', zipFile: "$BuildName"+'.zip'
+            }
+
+        stage ('Update Nexus Repo Latest Snapshot') {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/trinityIOT-SubsysINTG/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+        bat label: '', script: '"C:\\Program Files\\Git\\mingw64\\bin\\curl.exe" -v -u admin:TrInItY123 --upload-file SBIVAMSAlertIntegrationService.zip http://192.168.1.143:8081/repository/trinityIoTPlatform/Dev/latest/trinityIOT-SubsysINTG/SBIVAMSAlertIntegrationService.zip'
+          }
+	}	
