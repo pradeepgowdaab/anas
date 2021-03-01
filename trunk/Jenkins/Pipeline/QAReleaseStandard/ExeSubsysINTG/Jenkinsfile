@@ -52,6 +52,6 @@ node ("WindowsAgent")
               finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
-        bat label: '', script: '"C:\\Program Files\\Git\\mingw64\\bin\\curl.exe" -v -u admin:TrInItY123 --upload-file SBIVAMSAlertIntegrationService.zip http://192.168.1.143:8081/repository/trinityIoTPlatform/Dev/latest/trinityIOT-SubsysINTG/SBIVAMSAlertIntegrationService.zip'
+        bat label: '', script: '"C:\\Program Files\\Git\\mingw64\\bin\\curl.exe" -v -u admin:TrInItY123 --upload-file "$BuildName.zip" http://192.168.1.143:8081/repository/trinityIoTPlatform/Dev/latest/trinityIOT-SubsysINTG/SBIVAMSAlertIntegrationService.zip'
           }
 	}	
