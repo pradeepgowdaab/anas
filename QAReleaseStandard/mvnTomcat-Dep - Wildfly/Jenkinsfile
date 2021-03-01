@@ -108,7 +108,7 @@ node ("$JenkinNodeID") {
           deploy adapters: [jboss7(credentialsId: 'Wildfly', 
           url: '$tomcatUrl')],
           contextPath: "$contextPath",
-          war: '*war'
+          war: '**/*.war'
         }
         }
 		echo"$isTestJoBTriggerReq"
