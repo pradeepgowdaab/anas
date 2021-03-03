@@ -82,7 +82,9 @@ node ("$JenkinNodeID") {
           }
           }
 
-          stage ('Quality Gate Validation') {
+          echo"$isQGValidationReq"
+        if("$isQGValidationReq" == 'true')	  
+      stage ('Quality Gate Validation') {
           stageName = 'Quality Gate'
           def qg = waitForQualityGate()
           timeout(time: 1, unit: 'HOURS') {
