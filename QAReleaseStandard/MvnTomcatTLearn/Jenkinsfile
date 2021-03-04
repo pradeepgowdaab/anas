@@ -36,10 +36,18 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 		  def CAPath = 'master'
-		  def  artifact = readMavenPom().getArtifactId()
-          def  VERSION = readMavenPom().getVersion()
-          def  packaging = readMavenPom().getPackaging()
-          def  AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+		  def artifact = readMavenPom().getArtifactId()
+          def VERSION = readMavenPom().getVersion()
+          def packaging = readMavenPom().getPackaging()
+          def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+		  
+		  stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+		  sh '$CAPath mvn clean install -Dmaven.test.skip=true'
+          sh 'mvn clean install -Dmaven.test.skip=true'
+		  
+          }
+		    
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
@@ -51,7 +59,7 @@ node ("$JenkinNodeID") {
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''cd master && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
+            sh '''cd $CAPath && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
@@ -81,10 +89,6 @@ node ("$JenkinNodeID") {
           }
         }
 
-        stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-          sh 'mvn clean install -Dmaven.test.skip=true'
-          }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
