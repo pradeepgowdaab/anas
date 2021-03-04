@@ -40,13 +40,6 @@ node ("$JenkinNodeID") {
           def VERSION = readMavenPom().getVersion()
           def packaging = readMavenPom().getPackaging()
           def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-		  
-		  stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-		  sh 'cd master && mvn clean install -Dmaven.test.skip=true'
-          sh 'mvn clean install -Dmaven.test.skip=true'
-		  
-          }
 		    
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
@@ -75,6 +68,13 @@ node ("$JenkinNodeID") {
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
+          }
+		  
+		  stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+		  sh 'cd master && mvn clean install -Dmaven.test.skip=true'
+          sh 'mvn clean install -Dmaven.test.skip=true'
+		  
           }
 	 echo"$isQGValidationReq"
         if("$isQGValidationReq" == 'true')	  
