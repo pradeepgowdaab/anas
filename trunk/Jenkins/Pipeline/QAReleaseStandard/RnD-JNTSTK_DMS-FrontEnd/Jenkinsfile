@@ -79,7 +79,10 @@ node ("$JenkinNodeID")
               }
           }
         }
-
+       stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
