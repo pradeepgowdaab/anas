@@ -81,7 +81,7 @@ node ("$JenkinNodeID")
         }
        stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            zip archive: true, dir: 'dist/', glob: '', zipFile: "$BuildName"+'.war'
             }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
