@@ -93,7 +93,7 @@ node ("$JenkinNodeID") {
           deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
           url: "$tomcatUrl")],
           contextPath: "$contextPath",
-          war: '**/*.war'
+          war: 'target2/*.war'
         }
         }
 		echo"$isTestJoBTriggerReq"
