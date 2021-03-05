@@ -48,22 +48,8 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'cd master && mvn clean verify $MvnGoal'
             }
-
-        
-		  
-		  stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-          sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
-		  cd .. && mvn clean install -Dmaven.test.skip=true &&  \
-		 mkdir target2 && \
-		 find -iname '*.war' -exec cp {} target2/ \\;'''
-		  
-          }
-		  stage ('Package Build Libraries') {
-            stageName = 'Package Client Libraries'
-            zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
-            }
-		  stage ('Static Code Analysis & Coverage Validation') {
+			
+    stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
             sh '''cd master && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
@@ -83,6 +69,21 @@ node ("$JenkinNodeID") {
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
           }
+        
+		  
+		  stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
+		  cd .. && mvn clean install -Dmaven.test.skip=true &&  \
+		  mkdir target2 && \
+		  find -iname '*.war' -exec cp {} target2/ \\;'''
+		  
+          }
+		  stage ('Package Build Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
+            }
+		  
 		  
 	 echo"$isQGValidationReq"
         if("$isQGValidationReq" == 'true')	  
