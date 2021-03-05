@@ -43,9 +43,9 @@ node ("$JenkinNodeID")
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-            sh 'npm run ng build BIDataMgmtSSASSLib || error=true'
-			sh 'npm run ng build BIDataMgmtDWServiceLib || error=true'
-			sh 'npm run ng build BIDataMgmtSSISLib || error=true'
+            sh 'npm run ng build BIDataMgmtSSASSLib'
+			sh 'npm run ng build BIDataMgmtDWServiceLib'
+			sh 'npm run ng build BIDataMgmtSSISLib'
             }
 				   echo"$isStaticCodeAnalysisReq"
         if("$isStaticCodeAnalysisReq" == 'true')
