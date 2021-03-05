@@ -35,7 +35,7 @@ node ("$JenkinNodeID")
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-
+         def workspace = env.WORKSPACE
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
@@ -89,13 +89,13 @@ node ("$JenkinNodeID")
               {
         stage ('Update Nexus Repo Latest Snapshot') {
             
-			sh'''cd dist/BIDataMgmtSSASSLib && \
+			sh'''cd ${WORKSPACE}/dist/BIDataMgmtSSASSLib && \
 			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
 			
-			sh'''cd dist/BIDataMgmtDWServiceLib && \
+			sh'''cd /${WORKSPACE}/dist/BIDataMgmtDWServiceLib && \
 			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
 			
-			sh'''cd dist/BIDataMgmtSSISLib && \
+			sh'''cd ${WORKSPACE}/dist/BIDataMgmtSSISLib && \
 			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
         
           }
