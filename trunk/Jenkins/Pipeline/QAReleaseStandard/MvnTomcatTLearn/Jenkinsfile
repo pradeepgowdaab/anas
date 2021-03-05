@@ -83,6 +83,15 @@ node ("$JenkinNodeID") {
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
             }
+			stage ('Update Nexus Repo Latest Snapshot') {
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+			  
+		  sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"	  
+        }
 		  
 		  
 	 echo"$isQGValidationReq"
