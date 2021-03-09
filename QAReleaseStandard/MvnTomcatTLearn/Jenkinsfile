@@ -93,7 +93,10 @@ node ("$JenkinNodeID") {
           deploy adapters: [tomcat9(credentialsId: "$tomcatToken",
           url: "$tomcatUrl")],
           contextPath:"",
-          war: 'target2/*.war'
+		  sh '''cd /opt/Ansible/DevEnv/ElearningServices/ubuntu/'''
+		  sh '''
+		/usr/bin/ansible-playbook -i hosts site.yml'''
+          //war: 'target2/*.war'
 		  //sh 'mvn sakai:deploy -Dmaven.tomcat.home'
 		  //mvn sakai:deploy -Dmaven.tomcat.home=/opt/Projects/Tlearn/tomcat9-8085/webapps
         }
