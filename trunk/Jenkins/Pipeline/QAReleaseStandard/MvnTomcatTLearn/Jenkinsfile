@@ -94,7 +94,8 @@ node ("$JenkinNodeID") {
           url: "$tomcatUrl")],
           contextPath:"",
           war: 'target2/*.war'
-		  sh 'mvn sakai:deploy -Dmaven.tomcat.home'
+		  //sh 'mvn sakai:deploy -Dmaven.tomcat.home'
+		  //mvn sakai:deploy -Dmaven.tomcat.home=/opt/Projects/Tlearn/tomcat9-8085/webapps
         }
         }
 		echo"$isTestJoBTriggerReq"
