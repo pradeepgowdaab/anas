@@ -74,6 +74,8 @@ node ("$JenkinNodeID") {
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
             }
+			if("$NexusRepoReq" == 'true')
+              {
 			stage ('Update Nexus Repo Latest Snapshot') {
 
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
@@ -83,7 +85,7 @@ node ("$JenkinNodeID") {
 			  
 		  sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"	  
         }
-		  
+		}
 
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
@@ -93,14 +95,12 @@ node ("$JenkinNodeID") {
           deploy adapters: [tomcat9(credentialsId: "$tomcatToken",
           url: "$tomcatUrl")],
           contextPath:"",
-		  sh '''cd /opt/Ansible/DevEnv/ElearningServices/ubuntu/'''
-		  sh '''
-		/usr/bin/ansible-playbook -i hosts site.yml'''
-          //war: 'target2/*.war'
+          war: 'target2/*.war'
 		  //sh 'mvn sakai:deploy -Dmaven.tomcat.home'
 		  //mvn sakai:deploy -Dmaven.tomcat.home=/opt/Projects/Tlearn/tomcat9-8085/webapps
         }
-        }
+        } 
+		  
 		echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
