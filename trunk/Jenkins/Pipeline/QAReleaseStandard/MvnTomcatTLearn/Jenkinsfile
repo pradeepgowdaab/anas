@@ -96,7 +96,8 @@ node ("$JenkinNodeID") {
           stageName = 'Deployment to QA Environment'
 		  sh '''cd target2'''
          sh '''
-		 sshpass -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "*.war" "$remoteuser@$remotehost:$tomcatDir/"'''
+		 //sshpass -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "*.war" "$remoteuser@$remotehost:$tomcatDir/"'''
+		 sh '''sshpass -p trinity@123 scp -r -v *.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
         }
         } 
 		echo"$iswindowsDeploymentReq"
