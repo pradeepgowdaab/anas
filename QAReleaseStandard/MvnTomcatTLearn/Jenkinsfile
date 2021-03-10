@@ -94,8 +94,7 @@ node ("$JenkinNodeID") {
         {
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
-		  sh'''mvn sakai:deploy -Dmaven.tomcat.home=.'''
-		  //sh '''cd target2'''
+		  sh'''mvn sakai:deploy -Dmaven.tomcat.home="$Workspace"'''
          //sh '''sshpass -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "*.war" "$remoteuser@$remotehost:$tomcatDir/"'''
 		 sh '''sshpass -p trinity@123 scp -r -v target2/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
         }
