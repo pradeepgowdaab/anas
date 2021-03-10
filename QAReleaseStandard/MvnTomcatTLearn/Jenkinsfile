@@ -106,7 +106,7 @@ node ("$JenkinNodeID") {
             zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
             }
 			
-			if("$NexusRepoReq" == 'true')
+			if("$NexusRepoReq1" == 'true')
               {
 			stage ('Update Nexus Repo Latest Snapshot') {
 
