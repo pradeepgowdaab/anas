@@ -106,7 +106,7 @@ node ("$JenkinNodeID") {
             zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
             }
 			
-			if("$NexusRepoReq1" == 'true')
+			if("$NexusRepoReq" == 'true')
               {
 			stage ('Update Nexus Repo Latest Snapshot') {
 
@@ -165,7 +165,7 @@ stage ('Deployment to QA Environment') {
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
-        if("$NexusRepoReq" == 'true')
+        if("$NexusRepoReq1" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
