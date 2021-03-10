@@ -65,16 +65,25 @@ node ("$JenkinNodeID") {
 		  stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
-		  cd .. && mvn clean install -Dmaven.test.skip=true &&  \
-		  mkdir target2 && \
-		  find -iname '*.war' -exec cp {} target2/ \\;'''
+		  cd .. && mvn clean install -Dmaven.test.skip=true'''
 		  
           }
-		  stage ('Package Build Libraries') {
+		  
+			echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+        {
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+		  sh 'mkdir test'
+		  sh'''mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test'''
+         //sh '''sshpass -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "*.war" "$remoteuser@$remotehost:$tomcatDir/"'''
+		 sh '''sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
+        }
+        } 
+		stage ('Package Build Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: "target2/", glob: '', zipFile: "$BuildName"+'.zip'
+            zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
             }
-			
 			
 			if("$NexusRepoReq" == 'true')
               {
@@ -89,17 +98,7 @@ node ("$JenkinNodeID") {
         }
 		}
 
-        echo"$isDeploymentReq"
-        if("$isDeploymentReq" == 'true')
-        {
-        stage ('Deployment to QA Environment') {
-          stageName = 'Deployment to QA Environment'
-		  sh 'mkdir test'
-		  sh'''mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test'''
-         //sh '''sshpass -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "*.war" "$remoteuser@$remotehost:$tomcatDir/"'''
-		 sh '''sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
-        }
-        } 
+        
 		echo"$iswindowsDeploymentReq"
 if("$iswindowsDeploymentReq" == 'true')
         {
