@@ -97,10 +97,10 @@ node ("$JenkinNodeID") {
         stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
 		  sh 'mkdir test'
-		 sh'''mvn sakai:deploy -Dmaven.tomcat.home="$WorkSpace" && \
-		 sshpass -p "$remotepassword" scp -r -v test/webapps/*.war "$remoteuser@$remotehost:$tomcatDir"'''
-		 //sh''' mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test && \
-		 //sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
+		 //sh'''mvn sakai:deploy -Dmaven.tomcat.home="$WorkSpace" && \
+		 //sshpass -p "$remotepassword" scp -r -v test/webapps/*.war "$remoteuser@$remotehost:$tomcatDir"'''
+		 sh''' mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test && \
+		 sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
         }
         } 
 		stage ('Package Build Libraries') {
