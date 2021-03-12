@@ -39,7 +39,7 @@ node ("$JenkinNodeID")
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
             sh '''
-			/root/venv/bin/rasa train --fixed-model-name $BuildName --force			
+			/root/chatbot2.2/bin/rasa train --fixed-model-name $BuildName --force			
 			'''
             }
        stage ('Static Code Analysis & Coverage Validation') {
