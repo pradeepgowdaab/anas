@@ -82,6 +82,7 @@ node ("$JenkinNodeID")
 		sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "models/$BuildName.tar.gz"  "$remoteuser@$remotehost:$tomcatDir/"'''
         }
+		}
           if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
