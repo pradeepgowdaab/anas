@@ -286,7 +286,7 @@ node ("$JenkinNodeID") {
           }
               }
 			  if("$isDockerImageReq" == 'true')
-    {			{
+    {			
     stage ('Update Docker Repo Latest Snapshot') {
             stageName = 'Update Docker Repo Latest Snapshot'
 			
@@ -300,7 +300,6 @@ node ("$JenkinNodeID") {
 	
              }
     }
-	}
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
