@@ -285,6 +285,22 @@ node ("$JenkinNodeID") {
               }
           }
               }
+			  if("$DockerImageReq" == 'true')
+    {			{
+    stage ('Docker steps for building and pushing to Registry ') {
+            stageName = 'Docker Build And Push'
+			
+            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
+		    sh '''cp Server/trinitybase.df Server/target/trinitybase.df'''
+			sh '''cp Server/$BuildName.df Server/target/$BuildName.df'''
+			sh '''docker build -t trinitybaseimg:v1 -f Server/target/trinitybase.df .'''
+            sh '''docker build -t $BuildName:"${VERSION}" -f Server/target/$BuildName.df .'''
+            sh '''docker tag $BuildName:"${VERSION}" repo.trinityiot.in:8123/$BuildName:"${VERSION}"'''
+            sh '''docker push repo.trinityiot.in:8123/$BuildName:"${VERSION}"'''
+	
+             }
+    }
+	}
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
