@@ -285,12 +285,13 @@ node ("$JenkinNodeID") {
               }
           }
               }
+			  def VERSION = pom.getVersion()
 			  if("$isDockerImageReq" == 'true')
     {			
     stage ('Update Docker Repo Latest Snapshot') {
             stageName = 'Update Docker Repo Latest Snapshot'
 			
-			sh'''echo "${VERSION}"'''
+			sh'''echo "$VERSION"'''
             sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
 		    sh '''cp Server/trinitybase.df Server/target/trinitybase.df'''
 			sh '''cp Server/$BuildName.df Server/target/$BuildName.df'''
