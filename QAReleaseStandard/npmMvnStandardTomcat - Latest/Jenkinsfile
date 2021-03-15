@@ -285,7 +285,6 @@ node ("$JenkinNodeID") {
               }
           }
               }
-			  def VERSION = pom.getVersion()
 			  if("$isDockerImageReq" == 'true')
     {			
     stage ('Update Docker Repo Latest Snapshot') {
