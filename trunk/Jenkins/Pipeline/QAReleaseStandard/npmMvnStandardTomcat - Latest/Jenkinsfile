@@ -292,9 +292,9 @@ node ("$JenkinNodeID") {
 			
             sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
 		    sh '''cp Server/trinitybase.df Server/target/trinitybase.df'''
-			sh '''cp Server/$DocImageName.df Server/target/$DocImageName.df'''
+			sh '''cp Server/$BuildName.df Server/target/$BuildName.df'''
 			sh '''docker build -t trinitybaseimg:v1 -f Server/target/trinitybase.df .'''
-            sh '''docker build -t $DocImageName:"${VERSION}" -f Server/target/$DocImageName.df .'''
+            sh '''docker build -t $DocImageName:"${VERSION}" -f Server/target/$BuildName.df .'''
             sh '''docker tag $DocImageName:"${VERSION}" repo.trinityiot.in:8123/$DocImageName:"${VERSION}"'''
             sh '''docker push repo.trinityiot.in:8123/$DocImageName:"${VERSION}"'''
 	
