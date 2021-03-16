@@ -234,8 +234,8 @@ node ("$JenkinNodeID") {
 			sh '''cp Server/$BuildName.df Server/target/$BuildName.df'''
 			sh '''docker build -t trinitybaseimg:v1 -f Server/target/trinitybase.df .'''
             sh '''docker build -t $DocImageName:"${DocImageTag}" -f Server/target/$BuildName.df .'''
-            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$DocImageName:"${DocImageTag}"'''
-            sh '''docker push repo.trinityiot.in:8123/$DocImageName:"${DocImageTag}"'''
+            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
+            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
 	
              }
     }
