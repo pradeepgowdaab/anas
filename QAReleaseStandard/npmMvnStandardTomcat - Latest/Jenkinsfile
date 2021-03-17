@@ -302,7 +302,7 @@ node ("$JenkinNodeID") {
             sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
 	
              }
-    }
+    
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
