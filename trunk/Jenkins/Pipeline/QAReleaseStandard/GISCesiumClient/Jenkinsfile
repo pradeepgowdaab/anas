@@ -140,7 +140,7 @@ node ("$JenkinNodeID")
 			
 			sh'''echo "$VERSION"'''
             sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
-			sh '''mv  GISCesiumAPIService.war  GISCesiumAPIService/'''
+			sh '''cp  GISCesiumAPIService.war  GISCesiumAPIService/'''
 		    sh '''cd  GISCesiumAPIService'''
 			sh '''docker build -t trinitybaseimg:v1 -f GISCesiumAPIService/trinitybase.df .'''
             sh '''docker build -t $DocImageName:"${DocImageTag}" -f GISCesiumAPIService/$BuildName.df .'''
