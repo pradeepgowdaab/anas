@@ -149,6 +149,23 @@ node ("$JenkinNodeID")
 	
              }
        }
+	   
+	   		 if("$isDockerImageReqForClient" == 'true')
+          {			
+             stage ('Update Docker Repo Latest Snapshot') {
+            stageName = 'Update Docker Repo Latest Snapshot'
+			
+			sh'''echo "$VERSION"'''
+            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
+			sh '''cp  GISClientServices.war  GISClientServices/'''
+		    sh '''cd  GISClientServices'''
+			sh '''docker build -t trinitybaseimg:v1 -f GISClientServices/trinitybase.df .'''
+            sh '''docker build -t $DocImageName:"${DocImageTag}" -f GISClientServices/$BuildName.df .'''
+            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
+            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
+	
+             }
+       }
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
