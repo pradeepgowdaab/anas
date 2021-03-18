@@ -163,9 +163,9 @@ node ("$JenkinNodeID") {
               }
           }
               }
-			      if("$isDockerImageReq" == 'true')
-      {			
-       stage ('Update Docker Repo Latest Snapshot') {
+	 if("$isDockerImageReq" == 'true')
+          {			
+             stage ('Update Docker Repo Latest Snapshot') {
             stageName = 'Update Docker Repo Latest Snapshot'
 			
 			sh'''echo "$VERSION"'''
