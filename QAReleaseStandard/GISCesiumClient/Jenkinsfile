@@ -72,7 +72,7 @@ node ("$JenkinNodeID")
 
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'
-            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            zip archive: true, dir: "/$BuildName", glob: '', zipFile: "$BuildName"+'.war'
             }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
@@ -97,6 +97,41 @@ node ("$JenkinNodeID")
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
               }
+			  echo"$isTestJoBTriggerReq"
+        if("$isTestJoBTriggerReq" == 'true')
+		stage ('Build TestAutomation JOB') {
+          stageName = 'Build TestAutomation JOB'
+          build 'Automation'
+          }
+		  echo"$isTestingReq"
+        if("$isTestingReq" == 'true')
+		stage ('Intiate TestAutomation') {
+          stageName = 'Intiate TestAutomation'
+          sh '''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+          }
+		echo"$isZaPTestReqWithLogin"
+        if("$isZaPTestReqWithLogin" == 'true')
+		stage ('Intiate Zaptesting') {
+          stageName = 'Intiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py \
+                    -z "auth.loginurl=$Applicat_authloginurl \
+                    auth.username="$Application_authusername" auth.password="$Application_authpassword" auth.auto=1" || error=true '''
+          }
+		  echo"$isZaPTestReqWithoutLogin"
+        if("$isZaPTestReqWithoutLogin" == 'true')
+		stage ('Initiate Zaptesting') {
+          stageName = 'Initiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
+          }
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
