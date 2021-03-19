@@ -1,0 +1,135 @@
+node ("$JenkinNodeID")
+ {
+  try {
+        stage ('Code Checkout') {
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+         def workspace = env.WORKSPACE
+        stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+            sh 'npm install'
+             }
+
+        stage ('Complie, Build Client Libraries') {
+            stageName = 'Build Execution'
+            sh 'npm run ng build chatbot-lib'
+            }
+				   echo"$isStaticCodeAnalysisReq"
+        if("$isStaticCodeAnalysisReq" == 'true')
+       stage ('Static Code Analysis & Coverage Validation') {
+            stageName = 'Static Code Analysis'
+            withSonarQubeEnv('sonar') {
+            sh '''"$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
+            -Dsonar.projectKey="$sonarprojectName" \
+            -Dsonar.projectName="$sonarprojectName" \
+            -Dsonar.host.url="$sonarhosturl" \
+            -Dsonar.login="$sonarlogin" \
+            -Dsonar.password="$sonarpassword" \
+            -Dsonar.scm.enabled=true \
+            -Dsonar.scm.provider=svn \
+            -Dsonar.svn.username="$sonarsvnusername" \
+            -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+            -Dsonar.exclusions="$sonarexclusions" \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.jacoco.reportPath=target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+          }
+          }
+	   echo"$isQGValidationReq"
+        if("$isQGValidationReq" == 'true')
+        stage ('Quality Gate Validation') {
+          stageName = 'Quality Gate'
+          def qg = waitForQualityGate()
+          timeout(time: 1, unit: 'HOURS') {
+            echo '$qg'
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+        }
+
+
+          if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+            
+			sh'''cd ${WORKSPACE}/dist/chatbot-lib && \
+			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
+			
+        
+          }
+              }
+          currentBuild.result = 'SUCCESS'
+		  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
+                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
+                      issuetype: [name: 'Task'],
+                      labels: ['Jenkins','BuildSuccess'],
+                      assignee: [id: "${JiraQAOwnerID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+          }
+           catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+              }
+            }
+            finally {
+              stage ('Updation of Build Status into JIRA') {
+                echo currentBuild.result
+                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
+              }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
+  }
