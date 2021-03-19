@@ -42,15 +42,29 @@ node ("$JenkinNodeID")
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "$workspace", glob: '', zipFile: "$BuildName"+'.zip'
             }
+         if("$NexusRepoReq" == 'true')
+		 {
+		 stage ('Update Nexus Repo Latest Snapshot') {
+		   if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
 
-        stage ('Update Nexus Repo Latest Snapshot') {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Supportfiles/trinityIoT-CMLS/'+"$BuildName"+'.zip'
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+		  }
+        else
+              {	  
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
               finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
+		  }
+		  }
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
