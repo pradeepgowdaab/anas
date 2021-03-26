@@ -161,7 +161,7 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSIONS}"+'/'+"${AppBuildName}"
               finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
