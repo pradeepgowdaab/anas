@@ -41,7 +41,7 @@ node ("$JenkinNodeID") {
     def artifact = pom.getArtifactId()
     def VERSION = pom.getVersion()
     def packaging = 'jar'
-    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
+    def AppBuildName = "${artifact}"+"."+"${packaging}"
     
 	    echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
