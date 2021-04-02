@@ -286,7 +286,7 @@ node ("$JenkinNodeID") {
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
           }
-              }
+		  }
 	if("$isDockerBuildReq" == 'true')
     {	
 	 stage ('DockerBuild') {
@@ -296,7 +296,8 @@ node ("$JenkinNodeID") {
                     --build-arg PORT=$port \
                     --build-arg JMXPORT=$jmxport \
                     --no-cache ."""
-             }		 
+             }	
+}			 
 		if("$isDockerPushReq" == 'true')
 		{
 		  stage ('DockerPush') {
@@ -305,7 +306,6 @@ node ("$JenkinNodeID") {
 			  }
 				
           }
-		  }
 	}
           currentBuild.result = 'SUCCESS'
 		  sh '''
