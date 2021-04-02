@@ -306,7 +306,6 @@ node ("$JenkinNodeID") {
 			  }
 				
           }
-	}
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
