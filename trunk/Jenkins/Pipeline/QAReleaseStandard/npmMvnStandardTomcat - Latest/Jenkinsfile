@@ -263,8 +263,8 @@ node ("$JenkinNodeID") {
 		sh'''
          /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
             }
-       if("$NexusRepoReq" == 'true')
-              {
+        if("$NexusRepoReq" == 'true')
+           {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
@@ -284,8 +284,8 @@ node ("$JenkinNodeID") {
               echo "${nexustarget}"
               echo "${finalOut}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
-              }
-          }
+            }
+        }
 		  }
 	   def ImageName = "${​​​​​​​artifact}​​​​​​​"+":"+"latest"
        def ImageNameLw = "${​​​​​​​artifact}​​​​​​​"
@@ -307,19 +307,19 @@ node ("$JenkinNodeID") {
        if("$isDockerBuildReq" == 'true')
           {​​​​​​​
            stage ('DockerBuild') {​​​​​​​
-             stageName = 'Application Build Packaging'
-             sh """cd Server && docker build \
-             -t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
-             --build-arg PORT=$port \
-              --build-arg JMXPORT=$jmxport \
-              --no-cache ."""
+           stageName = 'Application Build Packaging'
+           sh """cd Server && docker build \
+           -t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
+           --build-arg PORT=$port \
+           --build-arg JMXPORT=$jmxport \
+           --no-cache ."""
            }​​​​​​​
           }​​​​​​​
        if("$isDockerPushReq" == 'true')
           {​​​​​​​
            stage ('DockerPush') {​​​​​​​
-            stageName = 'Application Build Packaging'
-            sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION"""
+           stageName = 'Application Build Packaging'
+           sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION"""
             }​​​​​​​
            }​​​​​​​
           currentBuild.result = 'SUCCESS'
