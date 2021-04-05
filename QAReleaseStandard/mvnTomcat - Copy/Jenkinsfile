@@ -39,6 +39,9 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
           def    AppBuildName = "${artifact}"+"."+"${packaging}"
+		  def ImageName = "${artifact}"+":"+"latest"
+          def ImageNameLw = "${artifact}"
+          echo "$ImageNameLw"
        	 
 			echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
