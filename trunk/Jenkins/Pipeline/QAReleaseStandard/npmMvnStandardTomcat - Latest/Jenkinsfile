@@ -287,41 +287,41 @@ node ("$JenkinNodeID") {
               }
           }
 		  }
-def ImageName = "${​​​​​​​artifact}​​​​​​​"+":"+"latest"
-def ImageNameLw = "${​​​​​​​artifact}​​​​​​​"
-echo "$ImageNameLw"
-stage ('npm Dependencies Installation') {​​​​​​​
-stageName = 'npm Dependencies Installation'
-sh '''cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
-npm install -D typescript && \
-npm install && npm run ng build "$ngBuildParam"'''
-}​​​​​​​
-stage ('copying Client binaries to server ') {​​​​​​​
-stageName = 'npm Dependencies Installation'
-sh '''rm -rf Server/src/main/webapp/$ClientBuildName && cp -r client/dist/$ClientBuildName/* Server/src/main/webapp/'''
-}​​​​​​​
-stage ('Application Build Packaging') {​​​​​​​
-stageName = 'Application Build Packaging'
-sh 'cd Server && mvn clean package -DskipTests=true'
-}​​​​​​​
-if("$isDockerBuildReq" == 'true')
-{​​​​​​​
-stage ('DockerBuild') {​​​​​​​
-stageName = 'Application Build Packaging'
-sh """cd Server && docker build \
--t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
---build-arg PORT=$port \
---build-arg JMXPORT=$jmxport \
---no-cache ."""
-}​​​​​​​
-}​​​​​​​
-if("$isDockerPushReq" == 'true')
-{​​​​​​​
-stage ('DockerPush') {​​​​​​​
-stageName = 'Application Build Packaging'
-sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION"""
-}​​​​​​​
-}​​​​​​​
+	          def ImageName = "${​​​​​​​artifact}​​​​​​​"+":"+"latest"
+              def ImageNameLw = "${​​​​​​​artifact}​​​​​​​"
+              echo "$ImageNameLw"
+              stage ('npm Dependencies Installation') {​​​​​​​
+              stageName = 'npm Dependencies Installation'
+              sh '''cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+              npm install -D typescript && \
+              npm install && npm run ng build "$ngBuildParam"'''
+             }​​​​​​​
+        stage ('copying Client binaries to server ') {​​​​​​​
+              stageName = 'npm Dependencies Installation'
+              sh '''rm -rf Server/src/main/webapp/$ClientBuildName && cp -r client/dist/$ClientBuildName/* Server/src/main/webapp/'''
+                }​​​​​​​
+        stage ('Application Build Packaging') {​​​​​​​
+              stageName = 'Application Build Packaging'
+              sh 'cd Server && mvn clean package -DskipTests=true'
+                }​​​​​​​
+              if("$isDockerBuildReq" == 'true')
+                {​​​​​​​
+              stage ('DockerBuild') {​​​​​​​
+              stageName = 'Application Build Packaging'
+              sh """cd Server && docker build \
+              -t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
+              --build-arg PORT=$port \
+              --build-arg JMXPORT=$jmxport \
+              --no-cache ."""
+                }​​​​​​​
+                }​​​​​​​
+        if("$isDockerPushReq" == 'true')
+          {​​​​​​​
+           stage ('DockerPush') {​​​​​​​
+            stageName = 'Application Build Packaging'
+            sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION"""
+            }​​​​​​​
+           }​​​​​​​
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
