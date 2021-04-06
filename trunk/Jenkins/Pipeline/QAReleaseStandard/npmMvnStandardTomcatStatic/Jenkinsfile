@@ -89,7 +89,7 @@ node ("$JenkinNodeID") {
             def AppBuildName = "${artifact}"+"."+"${packaging}"
             echo '$AppBuildName'
 			def ImageName = "${artifact}"+":"+"latest"
-            def ImageNameLw = "${artifact}"
+			def ImageNameLw = "${artifact}"
          
 			echo"$isUnitTCaseEReq"
             if("$isUnitTCaseEReq" == 'true')
