@@ -94,6 +94,9 @@ node ("$JenkinNodeID") {
             def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
             echo '$AppBuildName'
             echo"$isUnitTCaseEReq"
+		    def ImageName = "${artifact}"+":"+"latest"
+            def ImageNameLw = "${artifact}"
+          echo "$ImageNameLw"
             if("$isUnitTCaseEReq" == 'true')
 
         stage ('Unit test Case Exec') {
