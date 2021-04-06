@@ -111,12 +111,12 @@ node ("$JenkinNodeID")
 			  
         if("$isDockerBuildReq" == 'true')
            {​​​​​​​
-             stage ('DockerBuild') {​​​​​​​
-             stageName = 'Application Build Packaging'
-             sh """docker build \
-             -t ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ \
-             --no-cache ."""
-                }​​​​​​​
+          stage ('DockerBuild') {​​​​​​​
+          stageName = 'Application Build Packaging'
+          sh """docker build \
+          -t ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ \
+           --no-cache ."""
+            }​​​​​​​
            }​​​​​​​
         if("$isDockerPushReq" == 'true')
           {​​​​​​​
