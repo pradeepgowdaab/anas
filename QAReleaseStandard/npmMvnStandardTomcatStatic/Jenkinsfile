@@ -88,10 +88,9 @@ node ("$JenkinNodeID") {
             def packaging = pom.getPackaging()
             def AppBuildName = "${artifact}"+"."+"${packaging}"
             echo '$AppBuildName'
-			def ImageName = "${​​​​​​​artifact}​​​​​​​"+":"+"latest"
-            def ImageNameLw = "${​​​​​​​artifact}​​​​​​​"
-            echo "$ImageNameLw"
-            
+			def ImageName = "${artifact}"+":"+"latest"
+            def ImageNameLw = "${artifact}"
+         
 			echo"$isUnitTCaseEReq"
             if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
