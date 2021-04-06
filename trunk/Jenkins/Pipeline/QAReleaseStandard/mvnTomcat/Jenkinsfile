@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'mvn clean verify $MvnGoal'
             }
-
+          if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
