@@ -238,21 +238,21 @@ node ("$JenkinNodeID") {
           }
               }
         if("$isDockerBuildReq" == 'true')
-            {​​​​​​  ​
+        {​​​​​​  ​
         stage ('DockerBuild') {​​​​​​​
            stageName = 'Application Build Packaging'
             sh """cd Server && docker build \
             -t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
             --no-cache ."""
             }​​​​​​ ​
-            }​​​​​​​
+        }​​​​​​​
         if("$isDockerPushReq" == 'true')
-            {​​​​​​​
+         {​​​​​​​
         stage ('DockerPush') {​​​​​​​
                stageName = 'Application Build Packaging'
                sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​:$VERSION"""
             }​​​​​ ​​
-       }​​​​​​​
+        }​​​​​​​
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		     export ANSIBLE_HOST_KEY_CHECKING=False
