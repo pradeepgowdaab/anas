@@ -245,7 +245,7 @@ node ("$JenkinNodeID") {
             -t ${​​​​​​​ImageNameLw.toLowerCase()}​​​​​​​ \
             --no-cache ."""
             }​​​​​​ ​
-        }​​​​​​​
+         }​​​​​​​
         if("$isDockerPushReq" == 'true')
          {​​​​​​​
         stage ('DockerPush') {​​​​​​​
@@ -271,7 +271,7 @@ node ("$JenkinNodeID") {
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
-          }
+}
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
