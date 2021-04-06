@@ -109,21 +109,22 @@ node ("$JenkinNodeID")
           }
               }
 			  
-	 if("$isDockerImageReq" == 'true')
-       {			
-        stage ('Update Docker Repo Latest Snapshot') {
-            stageName = 'Update Docker Repo Latest Snapshot'
-			
-			sh'''echo "$VERSION"'''
-            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
-		
-			sh '''docker build -t trinitybaseimg:v1 -f trinitybase.df .'''
-            sh '''docker build -t $DocImageName:"${DocImageTag}" -f $BuildName.df .'''
-            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-	
-             }
-    }	  
+             if("$isDockerBuildReq" == 'true')
+             {​​​​​​​
+             stage ('DockerBuild') {​​​​​​​
+             stageName = 'Application Build Packaging'
+             sh """docker build \
+             -t ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ \
+             --no-cache ."""
+                }​​​​​​​
+                 }​​​​​​​
+            if("$isDockerPushReq" == 'true')
+            {​​​​​​​
+             stage ('DockerPush') {​​​​​​​
+           stageName = 'Application Build Packaging'
+            sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​BuildName.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​BuildName.toLowerCase()}​​​​​​​:$VERSION"""
+               }​​​​​​​
+               }​​​​​​​	  
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
