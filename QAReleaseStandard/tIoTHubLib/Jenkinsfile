@@ -172,8 +172,6 @@ node ("$JenkinNodeID") {
                       stageName = 'Application Build Packaging'
                       sh """docker build \
                       -t ${ImageNameLw.toLowerCase()} \
-                     --build-arg PORT=$port \
-                      --build-arg JMXPORT=$jmxport \
                       --no-cache ."""
                    }
                 }
