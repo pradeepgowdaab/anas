@@ -88,9 +88,9 @@ node ("$JenkinNodeID") {
             def packaging = pom.getPackaging()
             def AppBuildName = "${artifact}"+"."+"${packaging}"
             echo '$AppBuildName'
-            echo"$isUnitTCaseEReq"
+            
+			echo"$isUnitTCaseEReq"
             if("$isUnitTCaseEReq" == 'true')
-
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
