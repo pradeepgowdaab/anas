@@ -161,7 +161,7 @@ node ("$JenkinNodeID") {
            {
             stage ('DockerBuild') {
             stageName = 'Application Build Packaging'
-            sh """cd Server && docker build \
+            sh """docker build \
             -t ${ImageNameLw.toLowerCase()} \
             --no-cache ."""
             }
@@ -170,7 +170,7 @@ node ("$JenkinNodeID") {
           {
            stage ('DockerPush') {
            stageName = 'Application Build Packaging'
-           sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+           sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
           }
          }
           currentBuild.result = 'SUCCESS'
