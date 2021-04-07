@@ -107,8 +107,7 @@ node ("$JenkinNodeID")
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
-          }
-		     }  
+             }  
           if("$isDockerBuildReq" == 'true')
            {​​​​​​​
           stage ('DockerBuild') {​​​​​​​
