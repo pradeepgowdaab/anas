@@ -112,7 +112,7 @@ node ("$JenkinNodeID")
         {
           stage ('DockerBuild') {
           stageName = 'Application Build Packaging'
-           sh """docker build \
+           sh """mkdir target && cp *.war target/ && docker build \
            -t ${BuildName.toLowerCase()} \
            --no-cache ."""
         }
