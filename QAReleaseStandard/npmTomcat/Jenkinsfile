@@ -109,7 +109,7 @@ node ("$JenkinNodeID")
               }
           }
 		     }  
-        if("$isDockerBuildReq" == 'true')
+          if("$isDockerBuildReq" == 'true')
            {​​​​​​​
           stage ('DockerBuild') {​​​​​​​
           stageName = 'Application Build Packaging'
@@ -118,7 +118,7 @@ node ("$JenkinNodeID")
            --no-cache ."""
            }​​​​​​​
           }​​​​​​​
-        if("$isDockerPushReq" == 'true')
+          if("$isDockerPushReq" == 'true')
            {​​​​​​​
           stage ('DockerPush') {​​​​​​​
           stageName = 'Application Build Packaging'
