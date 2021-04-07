@@ -109,21 +109,23 @@ node ("$JenkinNodeID")
               }
              }  
         if("$isDockerBuildReq" == 'true')
-        {​​​​​​​
-          stage ('DockerBuild') {​​​​​​​
+        {
+          stage ('DockerBuild') {
           stageName = 'Application Build Packaging'
-          sh """docker build \
-          -t ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ \
+           sh """docker build \
+           -t ${BuildName.toLowerCase()} \
+           --build-arg PORT=$port \
+           --build-arg JMXPORT=$jmxport \
            --no-cache ."""
-        }​​​​​​​
-        }​​​​​​​
+        }
+        }
         if("$isDockerPushReq" == 'true')
-        {​​​​​​​
-          stage ('DockerPush') {​​​​​​​
-          stageName = 'Application Build Packaging'
-          sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${​​​​​​​BuildName.toLowerCase()}​​​​​​​ repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​BuildName.toLowerCase()}​​​​​​​:$VERSION && docker push repo.trinityiot.in:8123/${​​​​​​​NexusRepoID.toLowerCase()}​​​​​​​/${​​​​​​​Artifact_Product.toLowerCase()}​​​​​​​/${​​​​​​​BuildName.toLowerCase()}​​​​​​​:$VERSION"""
-           }​​​​​​​
-         }​​​  
+        {
+         stage ('DockerPush') {
+         stageName = 'Application Build Packaging'
+         sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+        }
+        }
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
