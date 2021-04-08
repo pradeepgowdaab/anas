@@ -40,8 +40,8 @@ node ("$JenkinNodeID") {
           def   packaging = readMavenPom().getPackaging()
           def    AppBuildName = "${artifact}"+"."+"${packaging}"
 		  def ImageName = "${artifact}"+":"+"latest"
-          def ImageNameLw = "${artifact}"
-          echo "$ImageNameLw"
+          def BuildName = "${artifact}"
+          echo "$BuildName"
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
@@ -162,7 +162,7 @@ node ("$JenkinNodeID") {
             stage ('DockerBuild') {
             stageName = 'Application Build Packaging'
             sh """docker build \
-            -t ${ImageNameLw.toLowerCase()} \
+            -t ${BuildName.toLowerCase()} \
             --no-cache ."""
             }
            }
@@ -170,7 +170,7 @@ node ("$JenkinNodeID") {
            {
              stage ('DockerPush') {
              stageName = 'Application Build Packaging'
-             sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+             sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
             }
           }
           currentBuild.result = 'SUCCESS'
