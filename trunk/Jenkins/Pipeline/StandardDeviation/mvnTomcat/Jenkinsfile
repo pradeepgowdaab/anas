@@ -40,6 +40,10 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def    packaging = readMavenPom().getPackaging()
           def  AppBuildName = "${artifact}"+"."+"${packaging}"
+		  def ImageName = "${artifact}"+":"+"latest"
+          def ImageNameLw = "${artifact}"
+          echo "$ImageNameLw"  
+		  
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
@@ -69,6 +73,22 @@ node ("$JenkinNodeID") {
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
         }
+          if("$isDockerBuildReq" == 'true')
+           {
+            stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+            sh """docker build \
+            -t ${ImageNameLw.toLowerCase()} \
+            --no-cache ."""
+            }
+           }
+         if("$isDockerPushReq" == 'true')
+          {
+           stage ('DockerPush') {
+           stageName = 'Application Build Packaging'
+           sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+          }
+         }		
           currentBuild.result = 'SUCCESS'
           }
           catch (e) { 
