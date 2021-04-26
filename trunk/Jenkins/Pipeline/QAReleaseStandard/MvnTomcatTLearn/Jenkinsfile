@@ -94,7 +94,7 @@ node ("$JenkinNodeID") {
 			echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
-        stage ('Deployment to QA Environment') {
+        stage ('Maven Sakai Deploy') {
 		if("$TomcatDeploy" == 'true')
 		{
           stageName = 'Deployment to QA Environment'
