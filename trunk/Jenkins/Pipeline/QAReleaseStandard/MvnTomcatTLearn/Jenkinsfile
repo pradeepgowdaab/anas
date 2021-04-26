@@ -106,7 +106,6 @@ node ("$JenkinNodeID") {
         }
 		else
 		{
-		echo "$WorkSpace"
 		sh ''' mkdir test && \
 		cd test && \
 		pwd && \
