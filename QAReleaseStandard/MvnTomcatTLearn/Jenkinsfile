@@ -109,7 +109,7 @@ node ("$JenkinNodeID") {
 		sh ''' mkdir test && \
 		cd test && \
 		pwd && \
-		mvn sakai:deploy -Dmaven.tomcat.home=.'''
+		mvn sakai:deploy -Dmaven.tomcat.home=*/test'''
         }
         }
         }		
