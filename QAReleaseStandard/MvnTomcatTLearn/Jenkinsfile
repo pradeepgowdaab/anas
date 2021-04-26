@@ -95,6 +95,8 @@ node ("$JenkinNodeID") {
         if("$isDeploymentReq" == 'true')
         {
         stage ('Deployment to QA Environment') {
+		if("$TomcatDeploy" == 'true')
+		{
           stageName = 'Deployment to QA Environment'
 		  sh 'mkdir test'
 		 //sh'''mvn sakai:deploy -Dmaven.tomcat.home=${WorkSpace} && \
@@ -107,7 +109,8 @@ node ("$JenkinNodeID") {
 		sh 'mkdir test'
 		sh''' mvn sakai:deploy -Dmaven.tomcat.home=./test'''
         }
-        }		
+        }
+       }		
 		stage ('Package Build Libraries') {
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
