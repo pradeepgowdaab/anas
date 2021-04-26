@@ -107,8 +107,8 @@ node ("$JenkinNodeID") {
 		else
 		{
 		sh ''' mkdir test && \
-		mvn sakai:deploy -Dmaven.tomcat.home= \
-		./test'''
+		mvn sakai:deploy -Dmaven.tomcat.home=\
+		$WorkSpace/test'''
         }
         }
         }		
