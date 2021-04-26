@@ -107,10 +107,11 @@ node ("$JenkinNodeID") {
 		else
 		{
 		sh ''' mkdir test && \
-		mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/trinityRESPOND_MAHA112/NGCADElearning/trinityRESPOND-NGCADElearning-MAHA112_Poc/test'''
+		mvn sakai:deploy -Dmaven.tomcat.home= \
+		./test'''
         }
         }
-       }		
+        }		
 		stage ('Package Build Libraries') {
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
