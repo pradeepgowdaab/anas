@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
           def VERSION = readMavenPom().getVersion()
           def packaging = readMavenPom().getPackaging()
           def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-		    
+		  def workspace = WORKSPACE 
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
@@ -106,10 +106,9 @@ node ("$JenkinNodeID") {
         }
 		else
 		{
+		echo "${workspace}"
 		sh ''' mkdir test && \
-		cd test && \
-		pwd && \
-		mvn sakai:deploy -Dmaven.tomcat.home=*/test'''
+		mvn sakai:deploy -Dmaven.tomcat.home=${workspace}/test'''
         }
         }
         }		
