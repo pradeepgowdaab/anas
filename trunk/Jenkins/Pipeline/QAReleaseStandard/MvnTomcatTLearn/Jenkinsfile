@@ -102,7 +102,12 @@ node ("$JenkinNodeID") {
 		 sh''' mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test && \
 		 sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
         }
-        } 
+		else
+		{
+		sh 'mkdir test'
+		sh''' mvn sakai:deploy -Dmaven.tomcat.home=./test'''
+        }
+        }		
 		stage ('Package Build Libraries') {
             stageName = 'Package Client Libraries'
             zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
