@@ -108,7 +108,7 @@ node ("$JenkinNodeID") {
 		{
 		echo "${workspace}"
 		sh ''' mkdir test && \
-		mvn sakai:deploy -Dmaven.tomcat.home=${workspace}/test'''
+		mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/trinityRESPOND_MAHA112/NGCADElearning/trinityRESPOND-NGCADElearning-MAHA112_Poc/test'''
         }
         }
         }		
