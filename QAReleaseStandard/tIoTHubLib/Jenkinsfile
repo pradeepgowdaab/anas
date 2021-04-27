@@ -57,7 +57,8 @@ node ("$JenkinNodeID") {
 			sh'zip -r $BuildName.zip target/site/jacoco/'
             sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
-
+           echo"$isStaticAnalysisReq"
+        if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
