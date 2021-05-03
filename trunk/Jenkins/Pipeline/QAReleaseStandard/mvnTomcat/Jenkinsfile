@@ -161,7 +161,8 @@ node ("$JenkinNodeID") {
            {
             stage ('DockerBuild') {
             stageName = 'Application Build Packaging'
-            sh """docker build \
+            sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 \
+			docker build \
             -t ${BuildName.toLowerCase()} \
             --no-cache ."""
             }
