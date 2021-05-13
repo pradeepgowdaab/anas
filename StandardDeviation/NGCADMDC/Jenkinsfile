@@ -1,4 +1,4 @@
-node ("$JenkinNodeID") {
++node ("$JenkinNodeID") {
   try {
         stage ('Code Checkout') {
           checkout([
@@ -35,33 +35,34 @@ node ("$JenkinNodeID") {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
 
-        stage ('Gradle Dependencies Installation') {
-            stageName = 'gradlew Dependencies Installation'
-             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && npm i -g cordova-res --unsafe-perm && ionic cordova resources android --force && \
-			      /usr/local/bin/ionic cordova $ionicparam && \
-				  cp -r build.gradle ./platforms/android/app/  && \
-				  /usr/local/bin/cordova clean android '''
+        stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+                  npm install && \
+				  npm run build:electron'''
              }
                                  
-             
-
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh ''' 
-			  cordova plugin add https://github.com/jamesla/backgroundvideo.git && \
-			   $CpParam && \
-			 /usr/local/bin/ionic cordova run android --prod --no-native-run || error=true'''
+             sh 'npm run deploy"'
             }
-        
-       stage ('Update Nexus Repo Latest Snapshot') {
+         stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            }
+			
+       if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"debug"+'.apk'
-              finalOut = 'platforms/android/app/build/outputs/apk/debug/'+"$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
+              }
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
