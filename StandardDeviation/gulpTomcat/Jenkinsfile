@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
              sh '''sudo n $nodejsVersion \
                   npm install && bower install --allow-root \
                   npm install -g $bowerParam && \
-                  gulp serve:dist'''
+                  npm install -g $gulpParam'''
              }
                                  
              
