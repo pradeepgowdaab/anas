@@ -43,7 +43,7 @@ node ("$JenkinNodeID")
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-            sh 'npm run ng build tIOTSDK'
+            sh 'npm run ng build'
             }
 				   echo"$isStaticCodeAnalysisReq"
         if("$isStaticCodeAnalysisReq" == 'true')
