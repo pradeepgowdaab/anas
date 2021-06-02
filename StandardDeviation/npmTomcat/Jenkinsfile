@@ -58,7 +58,7 @@ node ("$JenkinNodeID") {
 		      if("$BuildWithVerNo" == 'true')
               {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+"$BuildName"+'.war'
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"$BuildName"+'.war'
               finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
