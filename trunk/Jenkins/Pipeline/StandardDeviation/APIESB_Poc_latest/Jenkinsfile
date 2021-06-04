@@ -49,9 +49,7 @@ node ("$JenkinNodeID") {
 		  sh "cd ${RegPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           sh "cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
-          }
-
-		 
+          }	 
         if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
@@ -65,7 +63,7 @@ node ("$JenkinNodeID") {
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = "${CAPath}"+'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
