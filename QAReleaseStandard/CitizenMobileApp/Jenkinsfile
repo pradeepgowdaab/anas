@@ -70,10 +70,8 @@ node ("$JenkinNodeID") {
 		  
 		  stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh '''npm install && \
-		  ionic cordova platform add android && \
-          ionic cordova prepare android && \		  
-		  ionic cordova build android || error=true'''
+          sh '''npm install && ionic cordova platform add android && \
+          ionic cordova prepare android && ionic cordova build android || error=true'''
           }
 		  stage ('Update Nexus Repo Latest Snapshot') {
 
