@@ -73,6 +73,7 @@ node ("$JenkinNodeID") {
           sh 'npm install && npm install sharp'
 		  sh 'ionic cordova platform add android || error=true'
           sh 'ionic cordova prepare android || error=true'
+		  sh 'npm i @types/googlemaps@3.39.13'
 		  sh 'ionic cordova build android || error=true'
           }
 		  stage ('Update Nexus Repo Latest Snapshot') {
