@@ -43,7 +43,7 @@ node ("$JenkinNodeID")
             sh 'apt-get install python-virtualenv'   
             sh 'python3 -m venv Env'             
             sh '. Env/bin/activate'            
-            sh 'cd $BuildName && apt install python-pip'            
+            sh 'cd $BuildName && apt install -y python-pip'            
             sh 'cd $BuildName && pip install cmake && pip install -r requirements.txt'
             sh 'cd $BuildName && pip install coverage'
             }
