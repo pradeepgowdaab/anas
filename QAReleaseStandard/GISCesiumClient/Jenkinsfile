@@ -133,39 +133,22 @@ node ("$JenkinNodeID")
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
-		 if("$isDockerImageReq" == 'true')
-          {			
-             stage ('Update Docker Repo Latest Snapshot') {
-            stageName = 'Update Docker Repo Latest Snapshot'
-			
-			sh'''echo "$VERSION"'''
-            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
-			sh '''cp  GISCesiumAPIService.war  GISCesiumAPIService/'''
-		    sh '''cd  GISCesiumAPIService'''
-			sh '''docker build -t trinitybaseimg:v1 -f GISCesiumAPIService/trinitybase.df .'''
-            sh '''docker build -t $DocImageName:"${DocImageTag}" -f GISCesiumAPIService/$BuildName.df .'''
-            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-	
-             }
-       }
-	   
-	   		 if("$isDockerImageReqForClient" == 'true')
-          {			
-             stage ('Update Docker Repo Latest Snapshot') {
-            stageName = 'Update Docker Repo Latest Snapshot'
-			
-			sh'''echo "$VERSION"'''
-            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
-			sh '''cp  GISClientServices.war  GISClientServices/'''
-		    sh '''cd  GISClientServices'''
-			sh '''docker build -t trinitybaseimg:v1 -f GISClientServices/trinitybase.df .'''
-            sh '''docker build -t $DocImageName:"${DocImageTag}" -f GISClientServices/$BuildName.df .'''
-            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
-	
-             }
-       }
+        if("$isDockerBuildReq" == 'true')
+        {
+          stage ('DockerBuild') {
+          stageName = 'Application Build Packaging'
+           sh """mkdir target && cp *.war target/ && docker build \
+           -t ${BuildName.toLowerCase()} \
+           --no-cache ."""
+        }
+        }
+        if("$isDockerPushReq" == 'true')
+        {
+         stage ('DockerPush') {
+         stageName = 'Application Build Packaging'
+         sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+        }
+        }
           currentBuild.result = 'SUCCESS'
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
