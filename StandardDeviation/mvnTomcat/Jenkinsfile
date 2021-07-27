@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def    packaging = readMavenPom().getPackaging()
           def  AppBuildName = "${artifact}"+"."+"${packaging}"
-        stage ('Application Build Packaging') {
+          stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh 'mvn clean package -DskipTests=true'
           }
@@ -110,14 +110,13 @@ node ("$JenkinNodeID") {
 				  
            
             }
-            finally {
+            /*finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
                 jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-              }
+              }*/
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
               }
-			  }
               }
