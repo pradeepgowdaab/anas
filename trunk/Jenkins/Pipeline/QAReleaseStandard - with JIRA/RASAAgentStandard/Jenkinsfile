@@ -35,18 +35,17 @@ node ("$JenkinNodeID")
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-         def workspace = env.WORKSPACE
-        stage ('npm Dependencies Installation') {
-            stageName = 'npm Dependencies Installation'
-            sh 'npm install tIOTSDK'
-             }
 
-        				   echo"$isStaticCodeAnalysisReq"
-        if("$isStaticCodeAnalysisReq" == 'true')
+        stage ('Complie, Build Client Libraries') {
+            stageName = 'Build Execution'
+            sh '''alias python=python3.7 && \
+			/root/chatbot2.2/bin/rasa train --fixed-model-name $BuildName --force			
+			'''
+            }
        stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''cd ${WORKSPACE} && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
+            sh '''"$SonarScannerDir" -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
@@ -63,7 +62,7 @@ node ("$JenkinNodeID")
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
           }
-	   echo"$isQGValidationReq"
+          echo"$isQGValidationReq"
         if("$isQGValidationReq" == 'true')
         stage ('Quality Gate Validation') {
           stageName = 'Quality Gate'
@@ -75,18 +74,36 @@ node ("$JenkinNodeID")
               }
           }
         }
-
-
+        echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+        {
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+		sh '''
+		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "models/$BuildName.tar.gz"  "$remoteuser@$remotehost:$tomcatDir/"'''
+        }
+		}
           if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
-            
-			sh'''cd ${WORKSPACE} && \
-			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.tar.gz'
+              finalOut = 'models/'+"$BuildName"+'.tar.gz'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
               }
           currentBuild.result = 'SUCCESS'
-		  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+		  sh '''
+		     export ANSIBLE_HOST_KEY_CHECKING=False
+		     cd $Notification_Script 
+			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusUrl/repository/$NexusRepoID/Dev/$Artifact_Product/StaticAnalysis/$SonarProjectID.docx'''
+                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
                       description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
@@ -100,6 +117,10 @@ node ("$JenkinNodeID")
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
+			  sh '''
+			    export ANSIBLE_HOST_KEY_CHECKING=False
+			    cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
                 summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"

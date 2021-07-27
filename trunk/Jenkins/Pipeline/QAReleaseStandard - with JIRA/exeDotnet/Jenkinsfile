@@ -1,0 +1,65 @@
+node ("WindowsAgent")
+ {
+ stage ('Code Checkout') {
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+    stage('Begin SonarQube Analysis') {
+        
+ bat label: '', script: '"C:\\sonarqube-8.7.0.41497\\sonar-scanner-msbuild-4.7.0.2295-net46\\SonarQube.Scanner.MSBuild.exe" begin /k:"SBIVMSDVMAssetSyncService" /d:sonar.host.url="http://192.168.1.185:9000" /d:sonar.login="557cdedf35fb476a5f821334e3791168b456b59a"'
+     
+    stage ('Build') {
+		bat label: '', script: '"C:\\Program files (x86)\\Microsoft visual studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe\"'
+   
+    stage ('Complete SonarQube Analysis') {
+	
+            bat label: '', script: '"C:\\sonarqube-8.7.0.41497\\sonar-scanner-msbuild-4.7.0.2295-net46\\SonarQube.Scanner.MSBuild.exe" end  /d:sonar.login="557cdedf35fb476a5f821334e3791168b456b59a"'
+        }
+      }
+    }		
+    
+def workspace = env.WORKSPACE
+
+        stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: "$workspace", glob: '', zipFile: "$BuildName"+'.zip'
+            }
+
+        stage ('Update Nexus Repo Latest Snapshot') {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/trinityIOT-SubsysINTG/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+        bat label: '', script: '"C:\\Program Files\\Git\\mingw64\\bin\\curl.exe" -v -u admin:TrInItY123 --upload-file SBIVMSDVMAssetSyncService.zip http://192.168.1.143:8081/repository/trinityIoTPlatform/Dev/latest/trinityIOT-SubsysINTG/SBIVMSDVMAssetSyncService.zip'
+          }
+	}

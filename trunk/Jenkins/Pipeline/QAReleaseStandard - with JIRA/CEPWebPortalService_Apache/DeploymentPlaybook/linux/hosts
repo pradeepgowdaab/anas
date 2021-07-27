@@ -1,0 +1,11 @@
+[TargetServer]
+{{tomcatServerIP}} ansible_host={{tomcatServerIP}} ansible_user={{ansibleUser}} ansible_password={{ansiblePasswrd}} ansible_sudo_pass=={{ansiblePasswrd}} ansible_ssh_port={{ansibleSShPort}} ansible_ssh_extra_args='-o StrictHostkeyChecking=no'
+
+## Playbook Variables
+
+[TargetServer:vars]
+AnsibleScriptID={{AnsibleScriptID}}
+tomcatServerIP={{tomcatServerIP}}
+tomcatDir={{tomcatDir}}
+ApplicationSrcDirs={{ApplicationSrcDirs}}
+ServiceID={{ServiceID}}
