@@ -94,7 +94,7 @@ node ("$JenkinNodeID") {
 			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
                   java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
                   curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
-                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+              /*   def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
                       description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
@@ -103,6 +103,7 @@ node ("$JenkinNodeID") {
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  */
           }
           catch (e) { 
             currentBuild.result = 'FAILURE' 
@@ -112,7 +113,7 @@ node ("$JenkinNodeID") {
 			  export ANSIBLE_HOST_KEY_CHECKING=False
 			  cd $Notification_Script 
 				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
-                summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+            /*    summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
@@ -126,6 +127,7 @@ node ("$JenkinNodeID") {
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  */
               }
             }
             finally {
