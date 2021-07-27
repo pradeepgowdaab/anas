@@ -92,7 +92,7 @@ node ("$JenkinNodeID")
           }
               }
           currentBuild.result = 'SUCCESS'
-		  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+		 /* def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
                       description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
@@ -101,12 +101,13 @@ node ("$JenkinNodeID")
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  */
           }
            catch (e) { 
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+              /*  summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
@@ -120,6 +121,7 @@ node ("$JenkinNodeID")
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  */
               }
             }
             finally {

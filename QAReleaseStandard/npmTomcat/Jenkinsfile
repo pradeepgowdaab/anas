@@ -130,7 +130,7 @@ node ("$JenkinNodeID")
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+             /*   summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
@@ -144,6 +144,7 @@ node ("$JenkinNodeID")
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  */
               }
             }
             finally {
