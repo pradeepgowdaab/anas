@@ -122,5 +122,4 @@ node ("$JenkinNodeID") {
               {
               cleanWs() 
               }
-			  }
               }
