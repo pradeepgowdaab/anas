@@ -105,9 +105,10 @@ node ("$JenkinNodeID") {
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
+				  }
 				  */
 				  
-              }
+           
             }
             finally {
               stage ('Updation of Build Status into JIRA') {
