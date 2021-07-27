@@ -1,7 +1,7 @@
-node ("$JenkinNodeID")
- {
+node ("$JenkinNodeID") {
   try {
         stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
           checkout([
              $class: 'SubversionSCM',
 
@@ -35,15 +35,7 @@ node ("$JenkinNodeID")
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-         def workspace = env.WORKSPACE
-        stage ('npm Dependencies Installation') {
-            stageName = 'npm Dependencies Installation'
-            sh 'npm install tIOTSDK'
-             }
-
-        				   echo"$isStaticCodeAnalysisReq"
-        if("$isStaticCodeAnalysisReq" == 'true')
-       stage ('Static Code Analysis & Coverage Validation') {
+		 stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
             sh '''cd ${WORKSPACE} && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
@@ -62,10 +54,10 @@ node ("$JenkinNodeID")
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
             -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
-          }
-	   echo"$isQGValidationReq"
-        if("$isQGValidationReq" == 'true')
-        stage ('Quality Gate Validation') {
+			}
+        echo"$isQGValidationReq"
+        if("$isQGValidationReq" == 'true')	  
+      stage ('Quality Gate Validation') {
           stageName = 'Quality Gate'
           def qg = waitForQualityGate()
           timeout(time: 1, unit: 'HOURS') {
@@ -75,18 +67,33 @@ node ("$JenkinNodeID")
               }
           }
         }
-
-
-          if("$NexusRepoReq" == 'true')
-              {
-        stage ('Update Nexus Repo Latest Snapshot') {
-            
-			sh'''cd ${WORKSPACE} && \
-			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
+		  
+		  stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'npm install'
+		  sh 'ionic cordova platform add android'
+          sh 'ionic cordova prepare android'		  
+		  sh 'ionic cordova build android || error=true'
           }
-              }
+		  stage ('Update Nexus Repo Latest Snapshot') {
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"debug"+'.apk'
+              finalOut = 'platforms/android/app/build/outputs/apk/debug/'+"$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
           currentBuild.result = 'SUCCESS'
-		  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+		  sh '''
+		  export ANSIBLE_HOST_KEY_CHECKING=False
+		  cd $Notification_Script 
+			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
+		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+                 def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
                       summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
                       description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
                       issuetype: [name: 'Task'],
@@ -96,11 +103,15 @@ node ("$JenkinNodeID")
                   echo response.successful.toString()
                   echo response.data.toString()
           }
-           catch (e) { 
-            currentBuild.result = 'FAILURE'
+          catch (e) { 
+            currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+			  sh '''
+			  export ANSIBLE_HOST_KEY_CHECKING=False
+			  cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+                summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
@@ -126,4 +137,4 @@ node ("$JenkinNodeID")
               cleanWs() 
               }
               }
-  }
+              }

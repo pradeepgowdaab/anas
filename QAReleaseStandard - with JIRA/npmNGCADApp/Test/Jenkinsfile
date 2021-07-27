@@ -35,18 +35,22 @@ node ("$JenkinNodeID")
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-         def workspace = env.WORKSPACE
+
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh 'npm install tIOTSDK'
+            sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+                  npm install -D typescript && \
+                  npm install'''
              }
 
-        				   echo"$isStaticCodeAnalysisReq"
-        if("$isStaticCodeAnalysisReq" == 'true')
+        stage ('Complie, Build Client Libraries') {
+            stageName = 'Build Execution'
+            sh 'npm run ng build "$ngBuildParam"'
+            }
        stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''cd ${WORKSPACE} && "$SonarScannerDir" -Dsonar.projectBaseDir="${WORKSPACE}" \
+            sh '''"$SonarScannerDir" -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectName" \
             -Dsonar.projectName="$sonarprojectName" \
             -Dsonar.host.url="$sonarhosturl" \
@@ -77,24 +81,57 @@ node ("$JenkinNodeID")
         }
 
 
+        stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            }
+        echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+		if("$istomcatReq" == 'true')
+        {
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
+          url: "$tomcatUrl")],
+          contextPath: "$contextPath",
+          war: '**/*.war'
+        }
+		}
+		if("$isDeploymentReq" == 'true')
+		if("$iswindowsReq" == 'true')
+		{
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
+          url: "$tomcatUrl")],
+          contextPath: "$contextPath",
+          war: '**/*.war'
+        }
+		}
+		if("$isDeploymentReq" == 'true')
+		if("$isUbuntuReq" == 'true')
+		{
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+        sh '''sshpass  -p "$remotepassword" scp -r -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "/dist/$BuildName/"  "$remoteuser@$remotehost:/opt/$tomcatDir/webapps/$ServerBuild/"'''
+        sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo service $ServiceID restart"
+        echo $Deployment to QA Environment'''
+        }
+        }
           if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
-            
-			sh'''cd ${WORKSPACE} && \
-			npm publish --registry http://192.168.1.143:8081/repository/Trinity_npm'''
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
               }
           currentBuild.result = 'SUCCESS'
-		  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
-                      summary:  'Application Nightly Build '+"${BuildName}"+' is successful, Initiate QA Validation',
-                      description: 'Application is Deployed successfully and test execusion was successful, \n Refer Testlink Automation Report: \t'+ "${Report_Url}"+'\n Refer ZapProxy Automation Report: \t'+ "${Zap_Nexus_Url}",
-                      issuetype: [name: 'Task'],
-                      labels: ['Jenkins','BuildSuccess'],
-                      assignee: [id: "${JiraQAOwnerID}"]]]
-                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
-                  echo response.successful.toString()
-                  echo response.data.toString()
           }
            catch (e) { 
             currentBuild.result = 'FAILURE'
