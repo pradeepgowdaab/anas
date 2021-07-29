@@ -1,12 +1,13 @@
 pipeline {
     agent { label 'master' }
-    environment {
+   /* environment {
         CI = 'true'
         API_DIR = './SampleStore'
         DEV_ENV = 'dev'
         PROD_ENV = 'production'
         TEST_SCRIPT_FILE = 'sample_store.postman_collection.json'       
     }
+	*/
     stages {
         stage('Code Checkout') {
             steps{
