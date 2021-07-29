@@ -80,7 +80,7 @@ pipeline {
                     sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                       
                 }
                 echo 'Deploying to Production'
-                sh 'apictl import-api -f $API_DIR -e $PROD_ENV  --params $PROD_ENV/api_params.yaml -k --preserve-provider --update --verbose'
+                sh 'apictl import-api -f $API_DIR -e $PROD_ENV  --params $API_DIR/api_params.yaml -k --preserve-provider --update --verbose'
             }
         }
     }
