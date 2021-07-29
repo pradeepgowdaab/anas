@@ -1,5 +1,5 @@
 pipeline {
-    node ("$JenkinNodeID")
+    agent master
     tools {nodejs "Node"}
     environment {
         CI = 'true'
