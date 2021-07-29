@@ -46,9 +46,11 @@ pipeline {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
                 }
         }
-		echo"$isDeploytoDevReq"
-        if("$isDeploytoDevReq" == 'true')
-        stage('Deploy to Dev') {
+		
+        
+        stage('Deploy to Dev') 
+				echo"$isDeploytoDevReq"
+				if("$isDeploytoDevReq" == 'true') {
             environment{
                 RETRY = '80'
             }
@@ -62,17 +64,21 @@ pipeline {
                 sh 'apictl import-api -f $API_DIR -e $DEV_ENV -k --preserve-provider --update --verbose'
             }
         }
-		echo"$isRunTestsDevReq"
-        if("$isRunTestsDevReq" == 'true')
-       stage('Run Tests') {
+		}
+		
+       stage('Run Tests')
+       echo"$isRunTestsDevReq"
+        if("$isRunTestsDevReq" == 'true'){
             steps {
+			
                 echo 'Running tests in $DEV_ENV'
                 sh 'newman run $API_DIR/$TEST_SCRIPT_FILE --insecure'
             }
         }
+		}
+        stage('Deploy to Production')
 		echo"$isDeploytoProductionReq"
-        if("$isDeploytoProductionReq" == 'true')
-        stage('Deploy to Production') {
+        if("$isDeploytoProductionReq" == 'true'){		{
             environment{
                 RETRY = '60'
             }
@@ -87,6 +93,7 @@ pipeline {
             }
         }
     }
+	}
 	}
     post {
         cleanup {
