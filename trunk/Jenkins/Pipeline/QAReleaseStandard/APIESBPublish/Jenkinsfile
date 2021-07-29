@@ -70,7 +70,7 @@ pipeline {
                 RETRY = '60'
             }
             steps {
-			dir("${workspace}@tmp") {
+			dir("${workspace}") {
                 sh 'echo "Logging into $PROD_ENV"'
                 withCredentials([usernamePassword(credentialsId: 'apim_prod', usernameVariable: 'PROD_USERNAME', passwordVariable: 'PROD_PASSWORD')]) {
                     sh 'apictl login $PROD_ENV -u $PROD_USERNAME -p $PROD_PASSWORD -k'                       
