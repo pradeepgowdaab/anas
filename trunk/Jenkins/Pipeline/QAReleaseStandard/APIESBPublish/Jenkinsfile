@@ -2,7 +2,7 @@ pipeline {
     agent { label 'master' }
     environment {
         CI = 'true'
-        API_DIR = './SampleStore'
+        API_DIR = '${workspace}/SampleStore'
         DEV_ENV = 'dev'
         PROD_ENV = 'production'
         TEST_SCRIPT_FILE = 'sample_store.postman_collection.json'       
