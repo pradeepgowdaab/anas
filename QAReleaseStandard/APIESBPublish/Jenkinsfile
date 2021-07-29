@@ -46,9 +46,7 @@ pipeline {
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
                 }
         }
-		echo"$isDeploytoDevReq"
-        if("$isDeploytoDevReq" == 'true')
-         stage('Deploy to Dev') {
+       /* stage('Deploy to Dev') {
             environment{
                 RETRY = '80'
             }
@@ -70,8 +68,7 @@ pipeline {
                 sh 'newman run $API_DIR/$TEST_SCRIPT_FILE --insecure'
             }
         }
-		echo"$isDeploytoProductionReq"
-        if("$isDeploytoProductionReq" == 'true')
+		*/
         stage('Deploy to Production') {
             environment{
                 RETRY = '60'
