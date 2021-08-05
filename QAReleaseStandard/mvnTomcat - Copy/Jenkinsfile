@@ -182,7 +182,7 @@ node ("$JenkinNodeID") {
           }
 		 
 
-          currentBuild.result = 'SUCCESS' {
+          currentBuild.result = 'SUCCESS' 
 		  stage ('Report Success Status into JIRA') {
 		  sh '''
 		  export ANSIBLE_HOST_KEY_CHECKING=False
@@ -203,7 +203,6 @@ node ("$JenkinNodeID") {
                   echo response.data.toString()
 				  */
           }
-		  }
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
