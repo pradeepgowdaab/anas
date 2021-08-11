@@ -62,11 +62,11 @@ node ("$JenkinNodeID") {
           }
           currentBuild.result = 'SUCCESS'
           }
-           catch (e) { 
+          catch (e) { 
             currentBuild.result = 'FAILURE'
               Builderror = "${e}"
-           /*   stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+              stage ('Report Error Status into JIRA') {
+              /*  summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
                 descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
                 echo "${Builderror}"
                 echo "${summarymsg}"
@@ -81,13 +81,10 @@ node ("$JenkinNodeID") {
                   echo response.successful.toString()
                   echo response.data.toString()
 				  */
-              }
+				  }				  
             }
-            finally {
-              stage ('Updation of Build Status into JIRA') {
-                echo currentBuild.result
-                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-				}
-				
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
               }
-  }
+              }
