@@ -182,14 +182,8 @@ if("$isDockerBuildReq" == 'true')
             
               }
             }
-            finally {
-              stage ('Updation of Build Status into JIRA') {
-                echo currentBuild.result
-                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-              }
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
-              }
               }
               }
