@@ -68,33 +68,18 @@ node ("$JenkinNodeID")
           currentBuild.result = 'SUCCESS'
           }
            catch (e) { 
-            currentBuild.result = 'FAILURE'
+            currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-                summarymsg = 'Application '+"${BuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
-                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
-                echo "${Builderror}"
-                echo "${summarymsg}"
-                echo "${descriptionmsg}"
-                echo "${JIRAProjecKey}"
-                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
-                      summary:  "${summarymsg}",
-                      description: "${descriptionmsg}",
-                      issuetype: [name: 'Bug'],
-                      assignee: [id: "${JiraDeveloperID}"]]]
-                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
-                  echo response.successful.toString()
-                  echo response.data.toString()
+			  sh '''
+			  export ANSIBLE_HOST_KEY_CHECKING=False
+			  cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+            
               }
             }
-            finally {
-              stage ('Updation of Build Status into JIRA') {
-                echo currentBuild.result
-                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
-              }
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
               }
               }
-  }
