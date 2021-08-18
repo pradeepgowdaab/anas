@@ -44,6 +44,10 @@ node ("$JenkinNodeID") {
           stageName = 'Application Build Packaging'
           sh 'mvn clean package -DskipTests=true'
           }
+		  stage ('Package Libraries') {
+            stageName = 'Package Libraries'
+            zip archive: true, dir: 'target/'+"$BuildName.war"
+            }
 
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
@@ -111,13 +115,13 @@ node ("$JenkinNodeID") {
 				  
 				  
             }
-            finally {
+            /*finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
                 archiveArtifacts artifacts: '/target/$BuildName.war', onlyIfSuccessful: true
 				
               }
-			  }
+			  }*/
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
