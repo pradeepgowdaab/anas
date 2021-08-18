@@ -114,7 +114,7 @@ node ("$JenkinNodeID") {
             finally {
               stage ('Updation of Build Status into JIRA') {
                 echo currentBuild.result
-                archiveArtifacts artifacts: '*.war', onlyIfSuccessful: true
+                archiveArtifacts artifacts: '/target/*.war', onlyIfSuccessful: true
 				
               }
 			  }
