@@ -117,6 +117,7 @@ node ("$JenkinNodeID") {
                 archiveArtifacts artifacts: '${AppBuildName}.war', onlyIfSuccessful: true'
 				
               }
+			  }
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
