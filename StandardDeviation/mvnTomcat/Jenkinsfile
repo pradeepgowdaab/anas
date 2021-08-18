@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
           }
 		  stage ('Package Libraries') {
             stageName = 'Package Libraries'
-            zip archive: true, dir: 'target/'+"$BuildName.war", glob: '', zipFile: "$BuildName"+'.zip'
+            zip archive: true, dir: 'target/'+"$BuildName.war", glob: '', zipFile: "$BuildName.war"+'.zip'
             }
 
         stage ('Update Nexus Repo Latest Snapshot') {
