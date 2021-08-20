@@ -40,6 +40,7 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def    packaging = readMavenPom().getPackaging()
           def  AppBuildName = "${artifact}"+"."+"${packaging}"
+		  
           stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh 'mvn clean package -DskipTests=true'
