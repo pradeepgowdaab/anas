@@ -44,13 +44,6 @@ node ("$JenkinNodeID") {
           stageName = 'Application Build Packaging'
           sh 'mvn clean package -DskipTests=true'
           }
-		  /*
-		  if("$isPackageReq" == 'true')
-		  stage ('Package Libraries') {
-            stageName = 'Package Libraries'
-            archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
-            }
-			*/
 
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
