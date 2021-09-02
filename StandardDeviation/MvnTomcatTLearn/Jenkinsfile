@@ -41,14 +41,7 @@ node ("$JenkinNodeID") {
           def packaging = readMavenPom().getPackaging()
           def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
 		  def workspace = WORKSPACE 
-       	 echo"$isUnitTCaseEReq"
-        if("$isUnitTCaseEReq" == 'true')
-        stage ('Unit test Case Exec') {
-            stageName = 'Unit test Case Execution'
-            echo "${MvnGoal}"
-			sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
-		  cd .. && mvn clean verify -Dmaven.test.skip=true'''
-            }	  
+	  
 		  stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
