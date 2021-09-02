@@ -1,0 +1,99 @@
+node ("$JenkinNodeID") {
+  try {
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+		  def CAPath = 'master'
+		  def artifact = readMavenPom().getArtifactId()
+          def VERSION = readMavenPom().getVersion()
+          def packaging = readMavenPom().getPackaging()
+          def AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+		  def workspace = WORKSPACE 
+       	 echo"$isUnitTCaseEReq"
+        if("$isUnitTCaseEReq" == 'true')
+        stage ('Unit test Case Exec') {
+            stageName = 'Unit test Case Execution'
+            echo "${MvnGoal}"
+			sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
+		  cd .. && mvn clean verify -Dmaven.test.skip=true'''
+            }	  
+		  stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
+		  cd .. && mvn clean install -Dmaven.test.skip=true'''
+		  
+          }    
+		
+		stage ('Maven Sakai Deploy') {
+		echo "${workspace}"
+		sh ''' mkdir test && \
+		mvn sakai:deploy -Dmaven.tomcat.home=${WORKSPACE}/test'''
+        }		
+		stage ('Package Build Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: "test/webapps/", glob: '', zipFile: "$BuildName"+'.zip'
+            }
+			
+			if("$NexusRepoReq" == 'true')
+              {
+			stage ('Update Nexus Repo Latest Snapshot') {
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
+              finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+			  
+		  sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"	  
+        }
+		}	
+          currentBuild.result = 'SUCCESS'
+          }
+           catch (e) { 
+            currentBuild.result = 'FAILURE' 
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+			  sh '''
+			  export ANSIBLE_HOST_KEY_CHECKING=False
+			  cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+            
+              }
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
+			  
