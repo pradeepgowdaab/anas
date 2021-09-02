@@ -100,15 +100,16 @@ node ("$JenkinNodeID") {
           stageName = 'Deployment to QA Environment'
 		  sh 'mkdir test'
 		 sh'''mvn sakai:deploy -Dmaven.tomcat.home=./test && \
+		 sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
 		 //sshpass -p ${remotepassword} scp -r -v test/webapps/*.war "${remoteuser}@${remotehost}:${tomcatDir}"'''
 		 //sh''' mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test && \
-		 sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
+		 
         }
 		else
 		{
 		echo "${workspace}"
 		sh ''' mkdir test && \
-		mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/trinityRESPOND_MAHA112/NGCADElearning/trinityRESPOND-NGCADElearning-MAHA112_Poc/test'''
+		mvn sakai:deploy -Dmaven.tomcat.home=./test'''
         }
         }
         }		
