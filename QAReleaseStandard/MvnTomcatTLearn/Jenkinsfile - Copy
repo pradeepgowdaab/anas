@@ -102,6 +102,7 @@ node ("$JenkinNodeID") {
 		 sh'''mvn sakai:deploy -Dmaven.tomcat.home=${WORKSPACE}/test && \
 		 sshpass -p trinity@123 scp -r -v test/webapps/*.war root@192.168.8.182:/opt/Projects/Tlearn/apache-tomcat-9-8098/webapps'''
 		 //sshpass -p ${remotepassword} scp -r -v test/webapps/*.war "${remoteuser}@${remotehost}:${tomcatDir}"'''
+		 //sh''' mvn sakai:deploy -Dmaven.tomcat.home=/opt/Jenkins/workspace/RnD_TLEARN_V1.0/RnD_TLEARN_V1.0-ElearningServices-Nightly/test && \
 		 
         }
 		else
@@ -127,6 +128,17 @@ node ("$JenkinNodeID") {
               echo "${finalOut}"
 			  
 		  sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"	  
+        }
+		}
+
+        
+		echo"$iswindowsDeploymentReq"
+if("$iswindowsDeploymentReq" == 'true')
+        {
+stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+        sh '''
+		/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e ServiceName="${ServiceName}" -e Sourcepath="${Sourcepath}" -e BuildName="${BuildName}" -e targetpath="${targetpath}" -vvvv'''
         }
 		}
 		  
@@ -165,6 +177,46 @@ node ("$JenkinNodeID") {
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
+        if("$NexusRepoReq1" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+              if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+              else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+          }
+              }
+	if("$isDockerImageReq" == 'true')
+      {			
+       stage ('Update Docker Repo Latest Snapshot') {
+            stageName = 'Update Docker Repo Latest Snapshot'
+			
+			sh'''echo "$VERSION"'''
+            sh '''docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 '''
+		    sh '''cp trinitybase.df target/trinitybase.df'''
+			sh '''cp $BuildName.df target/$BuildName.df'''
+			sh '''docker build -t trinitybaseimg:v1 -f target/trinitybase.df .'''
+            sh '''docker build -t $DocImageName:"${DocImageTag}" -f target/$BuildName.df .'''
+            sh '''docker tag $DocImageName:"${DocImageTag}" repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
+            sh '''docker push repo.trinityiot.in:8123/$reponamedocker/$DocImageName:"${DocImageTag}"'''
+	
+             }
+       }
           currentBuild.result = 'SUCCESS'
 		 stage ('Report success Status into JIRA'){
 		  sh '''
