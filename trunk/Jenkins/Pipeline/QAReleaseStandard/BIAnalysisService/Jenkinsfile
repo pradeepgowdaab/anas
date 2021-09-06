@@ -73,7 +73,7 @@ node ("$JenkinNodeID") {
 	   stage ('Deployment to QA Environment') {
           stageName = 'Deployment to QA Environment'
 		sh '''
-		/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e BIEngineTargetMachine="${BIEngineTargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}"  -e BIEngine_drive="${BIEngine_drive}" -e BIEngine_Directory="${BIEngine_Directory}" -e NexusUrl="${NexusUrl}"  -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e BuildName="${BuildName}" -e Artifact_Product="${Artifact_Product}" -e NexusRepoID="${NexusRepoID}" -e Serviceport="${Serviceport}" -e testasync="${testasync}" -e testpoll="${testpoll}" -vvvv'''
+		/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e BIEngineTargetMachine="${BIEngineTargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}"  -e BIEngine_drive="${BIEngine_drive}" -e BIEngine_Directory="${BIEngine_Directory}" -e NexusUrl="${NexusUrl}"  -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e BuildName="${BuildName}" -e Artifact_Product="${Artifact_Product}" -e NexusRepoID="${NexusRepoID}" -e Serviceport="${Serviceport}" -e testasync="${testasync}" -e testpoll="${testpoll}" -e AppBuildName="${AppBuildName}" -vvvv'''
  }
  }
 			  
