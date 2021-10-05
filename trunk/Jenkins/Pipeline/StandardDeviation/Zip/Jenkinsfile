@@ -75,7 +75,7 @@ node ("$JenkinNodeID")
                   response = jiraNewIssue issue: issue, site: "${JiraSite}"
                   echo response.successful.toString()
                   echo response.data.toString()
-				  */
+				  *//
 				  }				  
             }
               stage ('Finishing: Sitback and Relax')
