@@ -45,7 +45,7 @@ node ("$JenkinNodeID") {
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-		  sh 'cd $BuildNameRegistry && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
+		  sh 'cd $BuildRegistry && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
           sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
           sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           }
