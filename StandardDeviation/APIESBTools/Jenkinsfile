@@ -39,24 +39,21 @@ node ("$JenkinNodeID") {
     def CAPath = "$BuildName" + 'Capp'
     def pom = readMavenPom file: "${CAPath}/pom.xml"
     def artifact = pom.getArtifactId()
+    def VERSION = pom.getVersion()
     def packaging = 'car'
-    def  AppBuildName = "${artifact}"+"."+"${packaging}"
+    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
-		  def VERSION = readMavenPom().getVersion()
           sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           }
 
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
-              echo "${AppBuildName}"
-              echo "${nexustarget}"
-              echo "${finalOut}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
