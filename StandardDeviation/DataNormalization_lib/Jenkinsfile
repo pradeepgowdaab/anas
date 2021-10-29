@@ -40,7 +40,7 @@ node ("$JenkinNodeID") {
 	def artifact = pom.getParent().getArtifactId()
 	 def    VERSION = readMavenPom().getVersion()
     def packaging = 'nar'
-    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
+    def  AppBuildName = "${artifact}"+"."+"${packaging}"
 	
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
