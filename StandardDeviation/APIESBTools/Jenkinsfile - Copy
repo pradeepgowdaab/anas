@@ -39,9 +39,9 @@ node ("$JenkinNodeID") {
     def CAPath = "$BuildName" + 'Capp'
     def pom = readMavenPom file: "${CAPath}/pom.xml"
     def artifact = pom.getArtifactId()
-    def    VERSION = readMavenPom().getVersion()
+    def VERSION = pom.getVersion()
     def packaging = 'car'
-    def  AppBuildName = "${artifact}"+"."+"${packaging}"
+    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
