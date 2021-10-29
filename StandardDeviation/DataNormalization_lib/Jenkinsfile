@@ -38,7 +38,7 @@ node ("$JenkinNodeID") {
           }
     def pom = readMavenPom file: "${CAPath}/pom.xml"
 	def artifact = pom.getParent().getArtifactId()
-    def VERSION = pom.getVersion()
+	 def    VERSION = readMavenPom().getVersion()
     def packaging = 'nar'
     def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
 	
