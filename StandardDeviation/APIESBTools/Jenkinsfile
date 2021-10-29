@@ -41,7 +41,7 @@ node ("$JenkinNodeID") {
     def artifact = pom.getArtifactId()
     def VERSION = pom.getVersion()
     def packaging = 'car'
-    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
+    def  AppBuildName = "${artifact}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
@@ -52,8 +52,11 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
             if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
               finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+			  echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
           else
