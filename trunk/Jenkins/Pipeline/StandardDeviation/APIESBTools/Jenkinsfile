@@ -39,13 +39,13 @@ node ("$JenkinNodeID") {
     def CAPath = "$BuildName" + 'Capp'
     def pom = readMavenPom file: "${CAPath}/pom.xml"
     def artifact = pom.getArtifactId()
-    def    VERSION = readMavenPom().getVersion()
     def packaging = 'car'
     def  AppBuildName = "${artifact}"+"."+"${packaging}"
     
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
+		  def VERSION = readMavenPom().getVersion()
           sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
           }
 
