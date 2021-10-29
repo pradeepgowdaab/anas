@@ -72,10 +72,10 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
 			-Dsonar.test.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+            -Dsonar.java.binaries=Main/target/classes \
+            -Dsonar.junit.reportsPath=Main/target/surefire-reports \
+            -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml'''
           }
           }
 	 echo"$isQGValidationReq"
@@ -147,7 +147,7 @@ node ("$JenkinNodeID") {
               if("$BuildWithVerNo" == 'true')
               {
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = 'Main/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
@@ -157,7 +157,7 @@ node ("$JenkinNodeID") {
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              finalOut = 'Main/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
               echo "${finalOut}"
