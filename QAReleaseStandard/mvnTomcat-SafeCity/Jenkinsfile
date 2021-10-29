@@ -72,10 +72,10 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusions" \
 			-Dsonar.test.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=Main/target/classes \
-            -Dsonar.junit.reportsPath=Main/target/surefire-reports \
-            -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml'''
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.jacoco.reportPath=target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
           }
           }
 	 echo"$isQGValidationReq"
@@ -117,7 +117,7 @@ node ("$JenkinNodeID") {
 		stage ('Intiate TestAutomation') {
           stageName = 'Intiate TestAutomation'
           sh '''
-			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e Main/targetMachine="${Main/targetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
           }
 		echo"$isZaPTestReqWithLogin"
         if("$isZaPTestReqWithLogin" == 'true')
@@ -146,20 +146,20 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-              nexusMain/target = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
-              finalOut = 'Main/target/'+"${AppBuildName}"+' '+"${nexusMain/target}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
-              echo "${nexusMain/target}"
+              echo "${nexustarget}"
               echo "${finalOut}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
               else
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexusMain/target = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = 'Main/target/'+"${AppBuildName}"+' '+"${nexusMain/target}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
-              echo "${nexusMain/target}"
+              echo "${nexustarget}"
               echo "${finalOut}"
               sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
               }
