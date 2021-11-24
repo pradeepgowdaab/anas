@@ -73,9 +73,9 @@ node ("$JenkinNodeID") {
             -Dsonar.exclusions="$sonarexclusions" \
 			-Dsonar.test.exclusions="$sonarexclusions" \
             -Dsonar.java.binaries=Main/target/classes,DIS/target/classes,ICCC/target/classes \
-            -Dsonar.junit.reportsPath=Main/target/surefire-reports,DIS/target/surefire-reports,ICCC/target/surefire-reports \
-            -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml,DIS/target/site/jacoco/jacoco.xml,ICCC/target/site/jacoco/jacoco.xml'''
+            -Dsonar.junit.reportsPaths=Main/target/surefire-reports,DIS/target/surefire-reports,ICCC/target/surefire-reports \
+            -Dsonar.jacoco.reportPaths=Main/target/jacoco.exec,DIS/target/jacoco.exec,ICCC/target/jacoco.exec \
+            -Dsonar.cobertura.reportPaths=Main/target/site/jacoco/jacoco.xml,DIS/target/site/jacoco/jacoco.xml,ICCC/target/site/jacoco/jacoco.xml'''
           }
           }
 	 echo"$isQGValidationReq"
