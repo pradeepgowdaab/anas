@@ -136,8 +136,8 @@ node ("$JenkinNodeID") {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
             sh '''cd ${WORKSPACE}/Server && mvn sonar:sonar -Dsonar.projectBaseDir=. \
-            -Dsonar.projectKey="$sonarprojectName" \
-            -Dsonar.projectName="$sonarprojectName" \
+            -Dsonar.projectKey="$sonarprojectNameServer" \
+            -Dsonar.projectName="$sonarprojectNameServer" \
             -Dsonar.host.url="$sonarhosturl" \
             -Dsonar.login="$sonarlogin" \
             -Dsonar.password="$sonarpassword" \
