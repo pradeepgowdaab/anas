@@ -87,10 +87,10 @@ node ("$JenkinNodeID") {
 			sh '''sudo n 10.16.2'''
              }
 
-            def pom = readMavenPom file: "Server/pom.xml"
-            def artifact = pom.getArtifactId()
-            def VERSION = pom.getVersion()
-            def packaging = pom.getPackaging()
+            def pom = readMavenPom file: "Server/Main/pom.xml"
+            def artifact = pom.parent.getArtifactId()
+            def VERSION = pom..parent.getVersion()
+            def packaging = pom.parent.getPackaging()
             def AppBuildName = "${artifact}"+"."+"${packaging}"
             echo '$AppBuildName'
 			
