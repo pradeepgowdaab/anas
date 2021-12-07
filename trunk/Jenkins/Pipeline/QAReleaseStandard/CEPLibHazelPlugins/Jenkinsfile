@@ -102,6 +102,7 @@ node ("$JenkinNodeID") {
 		  sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$hazelcastDir/"'''
         }
+		}
 		echo"$isDeploymentReqstreaming"
         if("$isDeploymentReqstreaming" == 'true')
         {
@@ -110,6 +111,7 @@ node ("$JenkinNodeID") {
         sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$streamingDir/"'''
         }
+		}
 		echo"$isDeploymentReqtooling"
         if("$isDeploymentReqtooling" == 'true')
         {
@@ -119,8 +121,6 @@ node ("$JenkinNodeID") {
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "component/target/$BuildName.jar"  "$remoteuser@$remotehost:$toolingDir/"'''
         }
         }
-		}
-		}
 		echo"$isTestJoBTriggerReq"
         if("$isTestJoBTriggerReq" == 'true')
 		stage ('Build TestAutomation JOB') {
