@@ -141,6 +141,7 @@ node ("$JenkinNodeID") {
             -Dsonar.scm.provider=svn \
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+			-Dsonar.test.exclusions="$sonarexclusions" \
             -Dsonar.exclusions="$sonarexclusionsServer" \
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
