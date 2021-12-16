@@ -79,7 +79,10 @@ node ("$JenkinNodeID")
         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo chmod -R 777 $tomcatDir/$BuildName"
         echo $Deployment to QA Environment'''
 		sh'''
-        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo cd $FilePath && sudo $ServiceID start"
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo cd $FilePath"
+        echo $Deployment to QA Environment'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sudo $ServiceID start"
         echo $Deployment to QA Environment'''
         }
         }
