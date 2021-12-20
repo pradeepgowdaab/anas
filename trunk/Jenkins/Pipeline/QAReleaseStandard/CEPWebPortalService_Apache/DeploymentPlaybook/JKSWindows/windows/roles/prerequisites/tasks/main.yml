@@ -1,0 +1,23 @@
+---
+
+
+- name: Create Development folder
+  win_file:
+    path: '{{drive}}:\{{jkspath}}'
+    state: directory
+
+- name: Set ACL of Development folder
+  win_acl:
+    path: '{{drive}}:\{{jkspath}}'
+    rights: FullControl
+    state: present
+    type: allow
+    user: '{{become_user}}'
+
+
+- name: copy jdk software to remote host
+  win_copy: src=./file/wso2carbon.jks  dest='{{drive}}:\\{{jkspath}}\\wso2carbon.jks'
+  
+- name: copy jdk software to remote host
+  win_copy: src=./file/output_store.jks  dest='{{drive}}:\\{{jkspath}}\\output_store.jks'  
+  
