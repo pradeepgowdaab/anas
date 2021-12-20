@@ -1,0 +1,6 @@
+---
+- hosts: wintel
+
+  roles:
+    - prerequisites
+

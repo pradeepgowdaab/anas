@@ -1,0 +1,10 @@
+[wintel]
+{{ansible_host}} ansible_host={{ansible_host}} ansible_user={{ansible_user}} ansible_password={{ansible_password}}
+[wintel:vars]
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore
+become=yes
+become_user={{ansible_user}}
+become_method=runas
+drive={{drive}}
+jkspath={{jkspath}}
