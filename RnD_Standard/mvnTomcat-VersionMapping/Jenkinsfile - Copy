@@ -44,25 +44,28 @@ stage ('Clean workspace')
           def  packaging = readMavenPom().getPackaging()
           def  AppBuildName = "${artifact}"+"."+"${packaging}"
 		  sh(script: "svn info --show-item last-changed-revision $SCM_checkout > tmp_svn")
-		  sh(script: "echo '$SCM_checkout ' | rev | grep -Eo '[0-9]{4}+' | rev > tmp_sprint")
           def svnRevision = readFile('tmp_svn').trim()
 
 stage ('Print SvnRevision SvnUrl and JenkinsJobNumber')
 {
-sh '''
-myvarsprint=`cat tmp_sprint` && \
-cd $FilePath && \
-sed -i "s|@DevopsSPRINT_NUMBER|${myvarsprint}|g" $FileName '''
+echo "JOB_URL=${env.JOB_URL}"
+sh '''cd $FilePath && \
+sed -i "s|JOB_URL|${JOB_URL}|g" $FileName '''
 echo "BUILD_NUMBER=${env.BUILD_NUMBER}"
 sh '''cd $FilePath && \
-sed -i "s|@DevopsBUILD_NUMBER|${BUILD_NUMBER}|g" $FileName'''
+sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|g" $FileName'''
+echo "$SCM_checkout"
+sh '''cd $FilePath && \
+sed -i "s|SVN_URL|${SCM_checkout}|g" $FileName'''
+echo svnRevision = readFile('tmp_svn').trim()
 sh '''
 myvar=`cat tmp_svn` && \
 cd $FilePath && \
-sed -i 's|@DevopsREVISION_NUMBER|'R-${myvar}'|g' $FileName'''  
+sed -i 's|REVISION_NUMBER|'R-${myvar}'|g' $FileName'''  
+
 sh '''
-myvarversion=`readMavenPom().getVersion()` && \
+myvarversion=`grep -oPm1 "(?<=<version>)[^<]+" "pom.xml"` && \
 cd $FilePath && \
-sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''                 
+sed -i "s|APP_VERSION|"${myvarversion}"|g" $FileName '''                 
 			 }			 
 }   
