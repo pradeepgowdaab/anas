@@ -5,7 +5,7 @@ stage ('Clean workspace')
               }
         stage ('Code Checkout') {
           /* groovylint-disable-next-line TrailingComma */
-         def checkoutResults = checkout([
+              checkout([
              $class: 'SubversionSCM',
 
               additionalCredentials: [],
@@ -38,7 +38,6 @@ stage ('Clean workspace')
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
 				
-				def svnversionnumber = checkoutResults.SVN_REVISION
 				
           }
 		  echo $svnversionnumber
