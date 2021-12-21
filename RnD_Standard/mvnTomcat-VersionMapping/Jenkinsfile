@@ -51,6 +51,7 @@ stage ('Clean workspace')
 stage ('Print SvnRevision SvnUrl and JenkinsJobNumber')
 {
 sh '''
+echo test && \
 myvarsprint=`cat tmp_sprint` && \
 cd $FilePath && \
 sed -i "s|@DevopsSPRINT_NUMBER|${myvarsprint}|g" $FileName '''
