@@ -44,7 +44,7 @@ stage ('Clean workspace')
           def  VERSION = readMavenPom().getVersion()
           def  packaging = readMavenPom().getPackaging()
           def  AppBuildName = "${artifact}"+"."+"${packaging}"
-		  sh(script: "svn info --show-item last-changed-revision . > tmp_svn")
+		  sh(script: "svn info --show-item revision . > tmp_svn")
 		  sh(script: "echo '$SCM_checkout ' | rev | grep -Eo '[0-9]{4}+' | rev > tmp_sprint")
           def svnRevision = readFile('tmp_svn').trim()
 
