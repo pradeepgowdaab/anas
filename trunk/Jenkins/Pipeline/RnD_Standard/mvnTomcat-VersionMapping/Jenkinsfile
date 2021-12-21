@@ -59,9 +59,9 @@ sed -i "s|@DevopsBUILD_NUMBER|${BUILD_NUMBER}|g" $FileName'''
 sh '''
 myvar=`cat tmp_svn` && \
 cd $FilePath && \
-sed -i 's|@DevopsREVISION_NUMBER|'R-${myvar}'|g' $FileName'''  
+sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''  
 sh '''
-myvarversion=`readMavenPom().getVersion()` && \
+myvarversion=`cat pom.xml | grep "<version>.*</version>" | head -2 | grep -v ".RELEASE"  |awk -F'[><]' '{print $3}'` && \
 cd $FilePath && \
 sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''                 
 			 }			 
