@@ -40,7 +40,6 @@ stage ('Clean workspace')
 				
 				
           }
-		  echo $svnversionnumber
           def  artifact = readMavenPom().getArtifactId()
           def  VERSION = readMavenPom().getVersion()
           def  packaging = readMavenPom().getPackaging()
