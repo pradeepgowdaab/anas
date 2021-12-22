@@ -67,8 +67,9 @@ sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''
 //cd $FilePath && \
 //sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''  
 sh '''
+myvarJIRAProjecKey="$JIRAProjecKey"
 curl  --request GET \
---url 'https://trinitymobilitypvtltd.atlassian.net/rest/api/2/project/"$JIRAProjecKey"/version' \
+--url 'https://trinitymobilitypvtltd.atlassian.net/rest/api/2/project/"$myvarJIRAProjecKey"/version' \
 --user 'bhargava.t@trinitymobility.com:9bHN5fTzf3gdpsWfjwtz3106' \
 --header 'Accept: application/json' | python -mjson.tool  > AppJiraRelease.json
 myvarAppJiraRelease=`egrep -i -B 3 '"released": true' AppJiraRelease.json | grep -i version | tail -1 | grep -Eo '[0-9\\.]+' | rev` && \
