@@ -62,9 +62,17 @@ sh '''
 myvar=`cat tmp_svn` && \
 cd $FilePath && \
 sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''  
+//sh '''
+//myvarversion=`cat pom.xml | grep "<version>.*</version>" | head -2 | grep -v ".RELEASE"  |awk -F'[><]' '{print $3}'` && \
+//cd $FilePath && \
+//sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''  
 sh '''
-myvarversion=`cat pom.xml | grep "<version>.*</version>" | head -2 | grep -v ".RELEASE"  |awk -F'[><]' '{print $3}'` && \
+curl  --request GET \
+--url 'https://trinitymobilitypvtltd.atlassian.net/rest/api/2/project/HKPFSAF/version' \
+--user 'bhargava.t@trinitymobility.com:9bHN5fTzf3gdpsWfjwtz3106' \
+--header 'Accept: application/json' | python -mjson.tool  > AppJiraRelease.json
+myvarAppJiraRelease=`egrep -i -B 3 '"released": true' AppJiraRelease.json | grep -i version | tail -1 | grep -Eo '[0-9\.]+' | rev` && \
 cd $FilePath && \
-sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''                 
+sed -i 's|@DevopsREVISION_NUMBER|'V${myvarAppJiraRelease}'|g' $FileName'''                 
 			 }			 
 }   
