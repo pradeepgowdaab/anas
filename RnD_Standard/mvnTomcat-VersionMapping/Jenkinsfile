@@ -74,6 +74,6 @@ curl  --request GET \
 --header 'Accept: application/json' | python -mjson.tool  > AppJiraRelease.json
 myvarAppJiraRelease=`egrep -i -B 3 '"released": true' AppJiraRelease.json | grep -i version | tail -1 | grep -Eo '[0-9\\.]+' | rev` && \
 cd $FilePath && \
-sed -i 's|@DevopsREVISION_NUMBER|'V${myvarAppJiraRelease}'|g' $FileName'''                 
+sed -i 's|@DevopsPRODUCT_NUMBER|'V${myvarAppJiraRelease}'|g' $FileName'''                 
 			 }			 
 }   
