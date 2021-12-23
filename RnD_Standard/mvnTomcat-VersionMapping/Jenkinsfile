@@ -70,7 +70,7 @@ sh '''
 myvarJIRAProjecKey="$JIRAProjecKey"
 curl  --request GET \
 --url 'https://trinitymobilitypvtltd.atlassian.net/rest/api/2/project/'"$myvarJIRAProjecKey"'/version' \
---user 'bhargava.t@trinitymobility.com:9bHN5fTzf3gdpsWfjwtz3106' \
+--user 'trinityadmin@trinitymobility.com:IDUCnhmT3CnhKkhoJKOdFBA5' \
 --header 'Accept: application/json' | python -mjson.tool  > AppJiraRelease.json
 myvarAppJiraRelease=`egrep -i -B 3 '"released": true' AppJiraRelease.json | grep -i version | tail -1 | grep -Eo '[0-9\\.]+'` && \
 cd $FilePath && \
