@@ -97,11 +97,9 @@ node ("$JenkinNodeID") {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
             sh 'cd Server && mvn clean verify $MvnGoal'
-            }
-	  echo"$isLogEReportReq"
-        if("$isLogReportReq" == 'true')		
+            }		
 	  stage ('Log Exec') {
-            stageName = 'Log4j Exec'
+            stageName = 'Log Exec'
             sh 'cd Server && curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/trinityICCC-CoC/QA/latest/trinityICCC-CoC/Log4j/log4j2-scan -o log4j2-scan'
 			sh 'cd Server && ./log4j2-scan . --report-csv log4j2_$BuildName.csv --report-json log4j2_$BuildName.json'
 			sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file log4j2_$BuildName.csv http://$NexusHost/repository/$ProjectID/QA/log4j2/log4j2_$BuildName.csv'
