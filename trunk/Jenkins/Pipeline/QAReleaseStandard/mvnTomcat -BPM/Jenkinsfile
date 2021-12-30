@@ -49,6 +49,11 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'mvn clean verify $MvnGoal'
             }
+stage ('Dependency check') {
+                dependencyCheck additionalArguments: '''--project $sonarprojectName
+                --scan .
+                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
+                 }
 
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
@@ -67,7 +72,13 @@ node ("$JenkinNodeID") {
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''		
           }
           }
 	 echo"$isQGValidationReq"
