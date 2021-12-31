@@ -105,6 +105,11 @@ node ("$JenkinNodeID") {
 			sh'cd Server && zip -r $BuildName.zip target/site/jacoco/'
             sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
+			stage ('Dependency check') {
+                dependencyCheck additionalArguments: '''--project $sonarprojectNameServer
+                --scan .
+                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
+                 }
 			echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
        stage ('Static Code Analysisfor Client & Coverage Validation') {
@@ -147,7 +152,13 @@ node ("$JenkinNodeID") {
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+			-Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
           }
           }
 	 echo"$isQGValidationReq"
