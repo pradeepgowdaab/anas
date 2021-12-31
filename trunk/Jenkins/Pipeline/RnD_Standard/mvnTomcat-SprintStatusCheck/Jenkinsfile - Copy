@@ -1,0 +1,71 @@
+node ("$JenkinNodeID") {
+stage ('Clean workspace')
+              {
+              cleanWs() 
+              }
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+         def checkoutResults = checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+				
+          }
+          def  artifact = readMavenPom().getArtifactId()
+          def  VERSION = readMavenPom().getVersion()
+          def  packaging = readMavenPom().getPackaging()
+          def  AppBuildName = "${artifact}"+"."+"${packaging}"
+		  sh(script: "svn info --show-item last-changed-revision $SCM_checkout > tmp_svn")
+          def svnRevision = readFile('tmp_svn').trim()
+
+stage ('Print SvnRevision SvnUrl and JenkinsJobNumber')
+{
+echo "JOB_URL=${env.JOB_URL}"
+sh '''cd $FilePath && \
+sed -i "s|JOB_URL|${JOB_URL}|g" $FileName '''
+echo "BUILD_NUMBER=${env.BUILD_NUMBER}"
+sh '''cd $FilePath && \
+sed -i "s|BUILD_NUMBER|${BUILD_NUMBER}|g" $FileName'''
+echo "$SCM_checkout"
+sh '''cd $FilePath && \
+sed -i "s|SVN_URL|${SCM_checkout}|g" $FileName'''
+echo svnRevision = readFile('tmp_svn').trim()
+sh '''
+myvar=`cat tmp_svn` && \
+cd $FilePath && \
+sed -i 's|REVISION_NUMBER|'R-${myvar}'|g' $FileName'''  
+
+sh '''
+myvarversion=`grep -oPm1 "(?<=<version>)[^<]+" "pom.xml"` && \
+cd $FilePath && \
+sed -i "s|APP_VERSION|"${myvarversion}"|g" $FileName '''                 
+			 }			 
+}   
