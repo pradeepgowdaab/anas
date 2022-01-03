@@ -10,14 +10,16 @@ myvarJIRASPID="$JIRASPID"
 curl  --request GET \
 --url 'https://trinitymobilitypvtltd.atlassian.net/rest/agile/1.0/sprint/'"$myvarJIRASPID"'/ \
 --user 'trinityadmin@trinitymobility.com:IDUCnhmT3CnhKkhoJKOdFBA5' \
---header 'Accept: application/json' | python -mjson.tool  >JiraSPID.json'''
+--header 'Accept: application/json' | python -mjson.tool  >JiraSPID.json
+'''
 sh'''
 echo 'if egrep -i 'state": "closed' JiraSPID.json; then
     echo "state=closed does exist!!"
 else
     echo "state=closed does not exist!!"
-fi'> JiraSPIDScript.sh'''
-sh '''chmod -R 777 JiraSPIDScript.sh JiraSPID.json'
+fi'> JiraSPIDScript.sh
+'''
+sh 'chmod -R 777 JiraSPIDScript.sh JiraSPID.json'
 def testResult =sh 'JiraSPIDScript.sh'
 if (testResult == 'state=closed does not exist!!') {
         error "test failed"
