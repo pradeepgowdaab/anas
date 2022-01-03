@@ -10,8 +10,7 @@ myvarJIRASPID="$JIRASPID"
 curl  --request GET \
 --url 'https://trinitymobilitypvtltd.atlassian.net/rest/agile/1.0/sprint/'"$myvarJIRASPID"'/ \
 --user 'trinityadmin@trinitymobility.com:IDUCnhmT3CnhKkhoJKOdFBA5' \
---header 'Accept: application/json' | python -mjson.tool  >JiraSPID.json
-'''
+--header 'Accept: application/json' | python -mjson.tool  >JiraSPID.json'''
 sh 'curl -u "$NexusUserID":"$NexusUserPass" http://192.168.1.143:8081/repository/trinityIoTPlatform-RnD/Supportfiles/JiraSPIDScript.sh -o JiraSPIDScript.sh' 
 sh 'chmod -R 777 JiraSPIDScript.sh JiraSPID.json'
 def testResult =sh 'JiraSPIDScript.sh'
