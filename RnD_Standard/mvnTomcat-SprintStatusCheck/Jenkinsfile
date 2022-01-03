@@ -8,7 +8,7 @@ stage ('Print SvnRevision SvnUrl and JenkinsJobNumber')
 sh'''
 myvarJIRASPID="$JIRASPID"
 curl  --request GET \
---url 'https://trinitymobilitypvtltd.atlassian.net/rest/agile/1.0/sprint/'"$myvarJIRASPID"'/ \
+--url 'https://trinitymobilitypvtltd.atlassian.net/rest/agile/1.0/sprint/'"$myvarJIRASPID"'/' \
 --user 'trinityadmin@trinitymobility.com:IDUCnhmT3CnhKkhoJKOdFBA5' \
 --header 'Accept: application/json' | python -mjson.tool  >JiraSPID.json
 curl -u "$NexusUserID":"$NexusUserPass" http://192.168.1.143:8081/repository/trinityIoTPlatform-RnD/Supportfiles/JiraSPIDScript.sh -o JiraSPIDScript.sh && \
