@@ -1,8 +1,8 @@
 node ("$JenkinNodeID") {
-stage ('Clean workspace')
-              {
-              cleanWs() 
-              }
+//stage ('Clean workspace')
+//              {
+//              cleanWs() 
+//              }
 stage ('Print SvnRevision SvnUrl and JenkinsJobNumber')
 {
 sh '''
