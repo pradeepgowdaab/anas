@@ -10,9 +10,9 @@ curl  --request GET \
 '''
 sh'''
 curl -u "$NexusUserID":"$NexusUserPass" http://192.168.1.143:8081/repository/trinityIoTPlatform-RnD/Supportfiles/JiraSPIDScript.sh -o JiraSPIDScript.sh 
-'''
-sh 'chmod -R 777 JiraSPIDScript.sh JiraSPID.json'
+chmod -R 777 JiraSPIDScript.sh JiraSPID.json
 def testResult =sh 'JiraSPIDScript.sh'
+'''
 if (testResult == 'state=closed does not exist!!') {
         error "test failed"
     }                 
