@@ -17,8 +17,7 @@ echo 'if egrep -i 'state": "closed' JiraSPID.json; then
 else
     echo "state=closed does not exist!!"
 fi'> JiraSPIDScript.sh'''
-sh '''chmod -R 777 JiraSPIDScript.sh JiraSPID.json
-'''
+sh '''chmod -R 777 JiraSPIDScript.sh JiraSPID.json'
 def testResult =sh 'JiraSPIDScript.sh'
 if (testResult == 'state=closed does not exist!!') {
         error "test failed"
