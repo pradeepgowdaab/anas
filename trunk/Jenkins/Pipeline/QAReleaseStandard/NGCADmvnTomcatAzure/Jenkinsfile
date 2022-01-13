@@ -39,6 +39,9 @@ node ("$JenkinNodeID") {
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
           def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
+		  sh(script: "svn info --show-item revision . > tmp_svn")
+		  sh(script: "echo '$SCM_checkout ' | rev | grep -Eo '[0-9]{4}+' | rev > tmp_sprint")
+          def svnRevision = readFile('tmp_svn').trim()
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
@@ -83,6 +86,31 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
+		  sh '''
+echo test && \
+myvarsprint=`cat tmp_sprint` && \
+cd $FilePath && \
+sed -i "s|@DevopsSPRINT_NUMBER|${myvarsprint}|g" $FileName '''
+echo "BUILD_NUMBER=${env.BUILD_NUMBER}"
+sh '''cd $FilePath && \
+sed -i "s|@DevopsBUILD_NUMBER|${BUILD_NUMBER}|g" $FileName'''
+sh '''
+myvar=`cat tmp_svn` && \
+cd $FilePath && \
+sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''  
+//sh '''
+//myvarversion=`cat pom.xml | grep "<version>.*</version>" | head -2 | grep -v ".RELEASE"  |awk -F'[><]' '{print $3}'` && \
+//cd $FilePath && \
+//sed -i "s|@DevopsPRODUCT_NUMBER|"${myvarversion}"|g" $FileName '''  
+sh '''
+myvarJIRAProjecKey="$JIRAProjecKey"
+curl  --request GET \
+--url 'https://trinitymobilitypvtltd.atlassian.net/rest/api/2/project/'"$myvarJIRAProjecKey"'/version' \
+--user 'trinityadmin@trinitymobility.com:IDUCnhmT3CnhKkhoJKOdFBA5' \
+--header 'Accept: application/json' | python -mjson.tool  > AppJiraRelease.json
+myvarAppJiraRelease=`egrep -i -B 3 '"released": true' AppJiraRelease.json | grep -i version | tail -1 | grep -Eo '[0-9\\.]+'` && \
+cd $FilePath && \
+sed -i 's|@DevopsPRODUCT_NUMBER|'${myvarAppJiraRelease}'|g' $FileName'''
           sh 'mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
