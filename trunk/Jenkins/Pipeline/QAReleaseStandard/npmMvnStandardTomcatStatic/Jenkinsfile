@@ -108,7 +108,8 @@ node ("$JenkinNodeID") {
 			stage ('Dependency check') {
                 dependencyCheck additionalArguments: '''--project $sonarprojectNameServer
                 --scan .
-                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
+                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check
+				--disableYarnAudit'
                  }
 			echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
