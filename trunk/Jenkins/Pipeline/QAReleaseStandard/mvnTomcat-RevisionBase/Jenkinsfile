@@ -154,7 +154,7 @@ sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''
               if("$BuildWithVerNo" == 'true')
               {
 			  sh 'myvar=`cat tmp_svn`'
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+'+"R-${myvar}"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${myvar}"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
