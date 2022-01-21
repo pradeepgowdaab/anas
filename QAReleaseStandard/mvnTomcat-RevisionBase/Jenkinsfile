@@ -153,7 +153,7 @@ sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-			  myvar=`cat tmp_svn`
+			  sh 'myvar=`cat tmp_svn`'
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+'+"R-${myvar}"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
