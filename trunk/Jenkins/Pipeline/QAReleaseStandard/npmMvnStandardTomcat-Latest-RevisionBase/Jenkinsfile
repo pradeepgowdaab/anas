@@ -70,7 +70,7 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-		  sh(script: "svn info --show-item revision . > Server/tmp_svn")
+		  sh(script: "svn info --show-item revision Server/. > Server/tmp_svn")
 		  sh(script: "echo '$SCM_checkout_Server ' | rev | grep -Eo '[0-9]{4}+' | rev > Server/tmp_sprint")
           def svnRevision = readFile('Server/tmp_svn').trim()
           
