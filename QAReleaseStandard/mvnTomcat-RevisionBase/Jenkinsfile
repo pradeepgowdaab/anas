@@ -95,11 +95,7 @@ node ("$JenkinNodeID") {
         }
 
         stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-sh '''
-myvar=`cat tmp_svn` && \
-cd $FilePath && \
-sed -i 's|@DevopsREVISION_NUMBER|'${myvar}'|g' $FileName'''  
+          stageName = 'Application Build Packaging' 
           sh 'mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
