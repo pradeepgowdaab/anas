@@ -1,0 +1,123 @@
+node ("$JenkinNodeID") {
+  try {
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+  
+          def    artifact = readMavenPom().getArtifactId()
+          def    VERSION = readMavenPom().getVersion()
+          def    packaging = readMavenPom().getPackaging()
+          def  AppBuildName = "${artifact}"+"."+"${packaging}"
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'mvn clean package -DskipTests=true'
+          }
+
+        stage ('Update Nexus Repo Latest Snapshot') {
+            if("$BuildWithVerNo" == 'true')
+              {
+              
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
+          else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+        }
+          if("$isDockerBuildReq" == 'true')
+           {
+            stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+            sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 &&
+			docker build \
+            -t ${BuildName.toLowerCase()} \
+            --no-cache ."""
+            }
+           }
+          if("$isDockerPushReq" == 'true')
+           {
+             stage ('DockerPush') {
+             stageName = 'Application Build Packaging'
+             sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+            }
+          }
+          currentBuild.result = 'SUCCESS'
+          }
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+           /*   stage ('Report Error Status into JIRA') {
+                summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+				  }
+				  */
+				  
+           
+            }
+            finally {
+              stage ('Updation of Build Status into JIRA') {
+                echo currentBuild.result
+                jiraSendBuildInfo branch: "${JIRAIssueKey}", site: 'trinitymobilitypvtltd.atlassian.net'
+              }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
+              }
