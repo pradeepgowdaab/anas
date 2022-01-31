@@ -1,0 +1,155 @@
+node ("$JenkinNodeID") {
+  try {
+       stage ('Server Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+         checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: 'Server',
+
+                  remote: '$SCM_checkout_Server']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+          stage ('Code Checkout Client') {
+          /* groovylint-disable-next-line TrailingComma */
+         checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: 'client',
+
+                  remote: '$SCM_checkout_Client']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+          
+          stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+			sh '''cd client && sudo n $nodejsVersion \
+                  npm install && bower install --allow-root \
+                  npm install -g $bowerParam \
+                  npm install -g $gulpParam'''
+               sh  'cd client && npm i'
+               sh  'cd client && gulp'
+               sh 'sudo n 10.16.2' 
+             }
+          stage ('copying Client binaries to server ') {
+            stageName = 'npm Dependencies Installation'
+            sh '''mv client/release/* Server/src/main/webapp/'''
+			sh '''cd Server/src/main/webapp && cat index.html >> index.jsp'''
+             }
+
+            def pom = readMavenPom file: "Server/pom.xml"
+            def artifact = pom.getArtifactId()
+            def VERSION = pom.getVersion()
+            def packaging = pom.getPackaging()
+           def    AppBuildName = "${artifact}"+"."+"${packaging}"
+           echo '$AppBuildName'
+           
+
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'cd Server && mvn clean package -DskipTests=true'
+          }
+     
+        if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+              if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
+              finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+              else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+          }
+              }
+          
+          currentBuild.result = 'SUCCESS'
+          }
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+              /*  summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+				  */
+				  }				  
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
