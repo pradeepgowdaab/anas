@@ -1,7 +1,6 @@
 node ("$JenkinNodeID") {
   try {
         stage ('Code Checkout') {
-          /* groovylint-disable-next-line TrailingComma */
           checkout([
              $class: 'SubversionSCM',
 
@@ -35,45 +34,68 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-  
-          def    artifact = readMavenPom().getArtifactId()
-          def    VERSION = readMavenPom().getVersion()
-          def    packaging = readMavenPom().getPackaging()
-          def  AppBuildName = "${artifact}"+"."+"${packaging}"
-		  
-		  sh(script: "svn info --show-item revision . > tmp_svn")
+          sh(script: "svn info --show-item revision . > tmp_svn")
 		  sh(script: "echo '$SCM_checkout ' | rev | grep -Eo '[0-9]{4}+' | rev > tmp_sprint")
           def svnRevision = readFile('tmp_svn').trim()
 		  
-          stage ('Application Build Packaging') {
-          stageName = 'Application Build Packaging'
-          sh 'mvn clean package -DskipTests=true'
-          }
+        stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+                  npm install -D typescript && \
+                  npm install'''
+             }
+                                 
+             
 
+        stage ('Complie, Build Client Libraries') {
+            stageName = 'Build Execution'
+             sh 'npm run ng build "$ngBuildParam"'
+            }
+        stage ('Package Client Libraries') {
+            stageName = 'Package Client Libraries'
+            zip archive: true, dir: 'dist/'+"$BuildName", glob: '', zipFile: "$BuildName"+'.war'
+            }
+
+        if("$NexusRepoReq" == 'true'){
         stage ('Update Nexus Repo Latest Snapshot') {
-            if("$BuildWithVerNo" == 'true')
+		      if("$BuildWithVerNo" == 'true')
               {
-              
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
-              echo "${AppBuildName}"
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"$BuildName"+'.war'
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
-          else
-              {
-              AppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
-              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
-              echo "${AppBuildName}"
+		  else
+		  {
+		  nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.war'
+              finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
-              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
               }
+			  }
+if("$isDockerBuildReq" == 'true')
+       {
+          stage ('DockerBuild') {
+          stageName = 'Application Build Packaging'
+           sh """mkdir target && cp *.war target/ && docker build \
+           -t ${BuildName.toLowerCase()} \
+           --no-cache ."""
         }
-          currentBuild.result = 'SUCCESS'
+        }
+        if("$isDockerPushReq" == 'true')
+        {
+         stage ('DockerPush') {
+         stageName = 'Application Build Packaging'
+         sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+        }
+        }		  
+		currentBuild.result = 'SUCCESS'
           }
           catch (e) { 
             currentBuild.result = 'FAILURE'
@@ -94,15 +116,8 @@ node ("$JenkinNodeID") {
                   echo response.successful.toString()
                   echo response.data.toString()
 				  */
-				  }			  
+				  }				  
             }
-            /*finally {
-              stage ('Updation of Build Status into JIRA') {
-                echo currentBuild.result
-                archiveArtifacts artifacts: '/target/$BuildName.war', onlyIfSuccessful: true
-				
-              }
-			  }*/
               stage ('Finishing: Sitback and Relax')
               {
               cleanWs() 
