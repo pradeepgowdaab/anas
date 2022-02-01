@@ -78,23 +78,7 @@ node ("$JenkinNodeID") {
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
           }
               }
-			  }
-if("$isDockerBuildReq" == 'true')
-       {
-          stage ('DockerBuild') {
-          stageName = 'Application Build Packaging'
-           sh """mkdir target && cp *.war target/ && docker build \
-           -t ${BuildName.toLowerCase()} \
-           --no-cache ."""
-        }
-        }
-        if("$isDockerPushReq" == 'true')
-        {
-         stage ('DockerPush') {
-         stageName = 'Application Build Packaging'
-         sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
-        }
-        }		  
+			  }		  
 		currentBuild.result = 'SUCCESS'
           }
           catch (e) { 
