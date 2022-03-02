@@ -96,7 +96,7 @@ node ("$JenkinNodeID") {
        echo"$isDeploymentReqhazelcastNode1"
         if("$isDeploymentReqhazelcastNode1" == 'true')
         {
-	   stage ('Deployment to QA Environment hazelcast') {
+	   stage ('Deployment to QA Environment hazelcast Node1') {
           stageName = 'Deployment to QA Environment hazelcast'
 		  sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target/$BuildName.jar"  "$remoteuser@$remotehost:$hazelcastDir1/"'''
@@ -105,7 +105,7 @@ node ("$JenkinNodeID") {
 		echo"$isDeploymentReqhazelcastNode2"
         if("$isDeploymentReqhazelcastNode2" == 'true')
         {
-	   stage ('Deployment to QA Environment hazelcast') {
+	   stage ('Deployment to QA Environment hazelcast Node2') {
           stageName = 'Deployment to QA Environment hazelcast'
 		  sh '''
 		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target/$BuildName.jar"  "$remoteuser@$remotehost:$hazelcastDir2/"'''
