@@ -39,7 +39,7 @@ node ("$JenkinNodeID") {
     def CAPath = 'component'
     def pom = readMavenPom file: "${CAPath}/pom.xml"
     def artifact = pom.getArtifactId()
-    def VERSION = pom.getVersion()
+   // def VERSION = pom.getVersion()
     def packaging = 'jar'
     def AppBuildName = "${artifact}"+"."+"${packaging}"
     sh(script: "svn info --show-item revision . > tmp_svn")
