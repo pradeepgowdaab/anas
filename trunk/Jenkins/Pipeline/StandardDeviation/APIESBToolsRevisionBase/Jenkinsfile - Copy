@@ -1,0 +1,97 @@
+node ("$JenkinNodeID") {
+         
+  try {
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+    def CAPath = "$BuildName" + 'Capp'
+    def pom = readMavenPom file: "${CAPath}/pom.xml"
+    def artifact = pom.getArtifactId()
+    def VERSION = pom.getVersion()
+    def packaging = 'car'
+    def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
+    
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
+          sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
+          }
+
+        stage ('Update Nexus Repo Latest Snapshot') {
+            if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = "${CAPath}"+'/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
+          else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+        }
+          currentBuild.result = 'SUCCESS'
+          }
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+              /*  summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+				  */
+				  }				  
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
