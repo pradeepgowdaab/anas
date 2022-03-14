@@ -42,7 +42,7 @@ node ("$JenkinNodeID")
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
             sh '''alias python=python3.7 && \
-			/root/chatbot2.2/bin/rasa train --fixed-model-name $BuildName --force			
+			/root/chatbot3.1/bin/rasa train --fixed-model-name $BuildName --force			
 			'''
             }
           if("$NexusRepoReq" == 'true')
