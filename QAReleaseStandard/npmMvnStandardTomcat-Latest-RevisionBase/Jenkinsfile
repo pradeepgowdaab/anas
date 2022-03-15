@@ -290,7 +290,7 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
               finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
@@ -300,7 +300,7 @@ node ("$JenkinNodeID") {
               else
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"R-${svnRevision}"+'/'+"${AppBuildName}"
               finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
