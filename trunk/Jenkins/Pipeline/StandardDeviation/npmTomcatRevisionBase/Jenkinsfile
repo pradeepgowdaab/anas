@@ -61,7 +61,7 @@ node ("$JenkinNodeID") {
 		      if("$BuildWithVerNo" == 'true')
               {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"$BuildName"+'.war'
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"R-${svnRevision}"+'/'+"$BuildName"+'.war'
               finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
@@ -70,7 +70,7 @@ node ("$JenkinNodeID") {
           }
 		  else
 		  {
-		  nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/stable/'+"$Artifact_Product"+'/'+"R-${svnRevision}"+'/'+"$BuildName"+'.war'
+		  nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"R-${svnRevision}"+'/'+"$BuildName"+'.war'
               finalOut = "$BuildName"+'.war'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
