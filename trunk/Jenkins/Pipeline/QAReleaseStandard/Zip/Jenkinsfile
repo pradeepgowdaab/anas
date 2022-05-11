@@ -51,7 +51,7 @@ node ("$JenkinNodeID")
               finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
-
+// test
           sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
 		  }
         else
