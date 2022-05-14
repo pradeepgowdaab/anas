@@ -57,7 +57,7 @@ if (testResult == 'state=closed does not exist!!') {
 		  def ImageName = "${artifact}"+":"+"latest"
           def ImageNameLw = "${artifact}"
           echo "$ImageNameLw"
-       	 
+ //test      	 
 			echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
