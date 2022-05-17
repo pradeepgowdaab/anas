@@ -149,8 +149,8 @@ node ("$JenkinNodeID") {
 			-Dsonar.test.exclusions="$sonarexclusions" \
             -Dsonar.java.binaries='Main/target/classes' \
             -Dsonar.junit.reportsPaths='Main/target/surefire-reports' \
-            -Dsonar.jacoco.reportPaths='Main/target/jacoco.exec' \
-            -Dsonar.cobertura.reportPaths='Main/target/site/jacoco/jacoco.xml' '''
+            -Dsonar.jacoco.reportPaths='Main/target/site/jacoco/common/jacoco.exec' \
+            -Dsonar.cobertura.reportPaths='Main/target/site/jacoco/common/jacoco.xml' '''
           }
           }
 	 echo"$isQGValidationReq"
