@@ -56,7 +56,7 @@ node ("$JenkinNodeID")
 		  }
         else
               {	  
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Supportfiles/'+"$Artifact_Product"+'/'+"$BuildName"+'.zip'
               finalOut = "$BuildName"+'.zip'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
