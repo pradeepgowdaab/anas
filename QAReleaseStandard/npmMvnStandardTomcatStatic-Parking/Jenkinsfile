@@ -70,19 +70,21 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-          
-        stage ('npm Dependencies Installation') {
+             stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh ''' sudo n $nodejsVersion \
+            sh ''' cd client && sudo n $nodejsVersion \
 				npm install --registry http://192.168.1.143:8081/repository/Trinity_npm/ sopexec@0.0.9 --save && \
 				npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
 				  npm install --registry http://192.168.1.143:8081/repository/trinityTIDE-Library-npm/ tide@2.0.0 --save && \
-                  npm install && npm run ng build "$ngBuildParam"'''
+                  npm run ng build "$ngBuildParam"'''
              }
+			 
+			 
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
             sh '''rm -rf Server/src/main/resources/static/* && cp -r client/dist/$ClientBuildName/* Server/src/main/resources/static/'''
+			sh '''sudo n 10.16.2'''
              }
 
             def pom = readMavenPom file: "Server/pom.xml"
@@ -91,10 +93,8 @@ node ("$JenkinNodeID") {
             def packaging = pom.getPackaging()
             def AppBuildName = "${artifact}"+"."+"${packaging}"
             echo '$AppBuildName'
-			def ImageName = "${artifact}"+":"+"latest"
-			def ImageNameLw = "${artifact}"
-         
-			echo"$isUnitTCaseEReq"
+			
+            echo"$isUnitTCaseEReq"
             if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
@@ -105,15 +105,9 @@ node ("$JenkinNodeID") {
         if("$isUnitTCaseEReportReq" == 'true')
         stage ('Unit test Case Report Exec') {
             stageName = 'Unit test Case ReportExecution'
-			sh'cd Server && zip -r $BuildName.zip target/site/jacoco/'
+			sh'cd Server && zip -r $BuildName.zip Main/target/site/jacoco/'
             sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
-			stage ('Dependency check') {
-                dependencyCheck additionalArguments: '''--project $sonarprojectNameServer
-                --scan .
-				--disableYarnAudit
-                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
-                 }
 			echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
        stage ('Static Code Analysisfor Client & Coverage Validation') {
@@ -138,7 +132,7 @@ node ("$JenkinNodeID") {
           }
 		  echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
-        stage ('Static Code Analysis for Server & Coverage Validation') {
+        stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
             sh '''cd ${WORKSPACE}/Server && mvn sonar:sonar -Dsonar.projectBaseDir=. \
@@ -151,18 +145,12 @@ node ("$JenkinNodeID") {
             -Dsonar.scm.provider=svn \
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
-            -Dsonar.exclusions="$sonarexclusionsServer" \
+            -Dsonar.exclusions="$sonarexclusions" \
 			-Dsonar.test.exclusions="$sonarexclusions" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-			-Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
-            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
-            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
-            -Dsonar.dependencyCheck.securityHotspot=true \
-            -Dsonar.dependencyCheck.summarize=true \
-            -Dsonar.dependencyCheck.skip=false \
-            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
+            -Dsonar.java.binaries='Main/target/classes' \
+            -Dsonar.junit.reportsPaths='Main/target/surefire-reports' \
+            -Dsonar.jacoco.reportPaths='Main/target/site/jacoco/common/jacoco.exec' \
+            -Dsonar.cobertura.reportPaths='Main/target/site/jacoco/common/jacoco.xml' '''
           }
           }
 	 echo"$isQGValidationReq"
@@ -204,7 +192,7 @@ node ("$JenkinNodeID") {
 		stage ('Intiate TestAutomation') {
           stageName = 'Intiate TestAutomation'
           sh '''
-			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll}" -e async_Result="${async_Result}" -e poll_Result="${poll_Result}" -e Nexusurl="${NexusUrl}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Project_Build="${Project_Build}" -e SpID="${SpID}" -e NexusRepoID="${NexusRepoID}" -e Env="${Env}" -vvvv'''
           }
 		echo"$isZaPTestReqWithLogin"
         if("$isZaPTestReqWithLogin" == 'true')
@@ -228,12 +216,61 @@ node ("$JenkinNodeID") {
                     zap-baseline.py -t $Application_BaseUrl \
                     -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
           }
+		  echo"$isReqCodeCoverageWindows"
+        if("$isReqCodeCoverageWindows" == 'true')
+		stage ('Initiate CodeCoverage') {
+          stageName = 'Initiate CodeCoverage'
+          sh '''/usr/bin/ansible-playbook -i $hostspathCodeCoverageReport $ansibleplaybookCodeCoverageReport --e TargetMachine="${WCoverageTargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e drive="${drive}" -e Codecoverage="${Codecoverage}" -e zip="${zip}" -e Service="${Service}" -e TomcatPath="${TomcatPath}" -e Nexusurl="${NexusUrl}" -e NexusRepoID="${NexusRepoID}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Env="${Env}" -e BuildName="${BuildName}" -e ModeofOperation="${ModeofOperation}" -vvvv'''
+          }
+		  
+		 echo"$isReqCodeCoverageUbuntuWithTomcatDir"
+        if("$isReqCodeCoverageUbuntuWithTomcatDir" == 'true')
+		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "chmod -R 777 $ubuntucoberturaPath/$zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/shutdown.sh"'''
+		 sh'''sleep 1m'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "$ubuntucoberturaPath/$zip/cobertura-report.sh --format html --datafile $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/cobertura.ser --destination $ubuntucoberturaPath/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
+		sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
+            }
+			echo"$isReqCodeCoverageUbuntuWithUserDir"
+        if("$isReqCodeCoverageUbuntuWithUserDir" == 'true')
+		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "chmod -R 777 $ubuntucoberturaPath/$zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/shutdown.sh"'''
+		 sh'''sleep 1m'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "$ubuntucoberturaPath/$zip/cobertura-report.sh --format html --datafile $coberturaUserDir/cobertura.ser --destination $ubuntucoberturaPath/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
+		sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
+            }
 		if("$NexusRepoReq" == 'true')
               {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
@@ -243,7 +280,7 @@ node ("$JenkinNodeID") {
               else
               {
               AppBuildName = "${artifact}"+'.'+"${packaging}"
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/Dev/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
               finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
@@ -252,22 +289,23 @@ node ("$JenkinNodeID") {
               }
           }
               }
-          if("$isDockerBuildReq" == 'true')
-          {
-           stage ('DockerBuild') {
-           stageName = 'Application Build Packaging'
-           sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && cd Server && docker build \
-           -t ${ImageNameLw.toLowerCase()} \
-           --no-cache ."""
-           }
+	if("$isDockerBuildReq" == 'true')
+    {	
+	 stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+			  sh """cd Server && docker build \
+			        -t ${ImageNameLw.toLowerCase()} \
+                    --no-cache ."""
+             }	
+}			 
+		if("$isDockerPushReq" == 'true')
+		{
+		  stage ('DockerPush') {
+			  stageName = 'Application Build Packaging'
+			  sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+			  }
+				
           }
-         if("$isDockerPushReq" == 'true')
-         {
-          stage ('DockerPush') {
-          stageName = 'Application Build Packaging'
-          sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
-         }
-        }
           currentBuild.result = 'SUCCESS'
 		 stage ('Report success Status into JIRA'){
 		  sh '''
