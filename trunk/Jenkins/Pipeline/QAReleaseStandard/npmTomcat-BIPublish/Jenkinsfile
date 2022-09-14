@@ -38,7 +38,6 @@ node ("$JenkinNodeID")
          def workspace = env.WORKSPACE
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-	    sh ''' cd client && sudo n $nodejsVersion \
             sh 'npm install'
              }
 
