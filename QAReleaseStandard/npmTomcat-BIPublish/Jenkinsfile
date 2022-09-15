@@ -43,9 +43,11 @@ node ("$JenkinNodeID")
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
+			sh 'sudo n $nodejsVersion'
             sh 'npm run ng build BIDataMgmtSSASSLib'
 			sh 'npm run ng build BIDataMgmtDWServiceLib'
 			sh 'npm run ng build BIDataMgmtSSISLib'
+			sh 'sudo n 10.16.2'
             }
 				   echo"$isStaticCodeAnalysisReq"
         if("$isStaticCodeAnalysisReq" == 'true')
