@@ -76,7 +76,6 @@ node ("$JenkinNodeID") {
             sh ''' sudo n $nodejsVersion && \
 			npm link @angular/cli && \
 			        npm install -D typescript && \
-					npm install --save-dev @angular-devkit/build-angular && \
 			      cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && npm install --registry && \
 				  npm install --registry http://192.168.1.143:8081/repository/Trinity_npm/ sopexec@0.0.9 --save && \
 				  npm install --registry http://192.168.1.143:8081/repository/trinityTIDE-Library-npm/ tide@2.0.0 --save && \
