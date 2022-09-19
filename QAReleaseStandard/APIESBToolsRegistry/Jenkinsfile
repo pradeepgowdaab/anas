@@ -43,7 +43,7 @@ node ("$JenkinNodeID") {
     def VERSION = pom.getVersion()
     def packaging = 'car'
     def AppBuildName = "${artifact}"+"_"+"${VERSION}"+"."+"${packaging}"
-    
+#xx   
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
           sh "cd ${RegPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
