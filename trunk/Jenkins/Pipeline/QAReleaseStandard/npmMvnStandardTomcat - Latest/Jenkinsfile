@@ -74,7 +74,6 @@ node ("$JenkinNodeID") {
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
             sh '''cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
-			sudo n $nodejsVersion \
 			npm install --registry http://192.168.1.143:8081/repository/trinityTIDE-Library-npm/ tide@2.0.0 --save && \
                   npm install -D typescript && \
                   npm install && npm run ng build "$ngBuildParam"'''
@@ -82,7 +81,6 @@ node ("$JenkinNodeID") {
           stage ('copying Client binaries to server ') {
             stageName = 'npm Dependencies Installation'
             sh '''rm -rf Server/src/main/webapp/$ClientBuildName && cp -r client/dist/$ClientBuildName/* Server/src/main/webapp/'''
-			sh 'sudo n 10.16.2'
              }
 
             def pom = readMavenPom file: "Server/pom.xml"
