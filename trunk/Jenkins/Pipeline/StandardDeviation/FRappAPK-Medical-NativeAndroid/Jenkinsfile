@@ -56,7 +56,7 @@ node ("$JenkinNodeID") {
 
               nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"release"+'.apk'
               //finalOut = 'app/release/'+"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
-			  finalOut = ./"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
+			  finalOut = "$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
