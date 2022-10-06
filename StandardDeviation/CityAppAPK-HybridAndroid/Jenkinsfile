@@ -39,28 +39,28 @@ node ("$JenkinNodeID") {
             sh '''npm install'''
              }
 
-        stage ('Gradle Dependencies Installation') {
+        /*stage ('Gradle Dependencies Installation') {
             stageName = 'gradlew Dependencies Installation'
              sh '''chmod +x gradlew &&\
 			      ./gradlew clean
 			 '''
-             }                                              
+             }*/                                              
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
              sh 'ionic cordova platform add android@10'
              sh 'ionic cordova prepare android'
-			 sh 'ionic cordova build android –prod --release'
-			 sh 'echo -n "trinity@123" | jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore /root/qatarionicapk/QatarCityApp.keystore ./app/build/outputs/apk/release/NGCADFRApp-release-unsigned.apk TrinityMobility'
+			 sh 'ionic cordova build android -prod'
+			 sh 'echo -n "trinity@123" | jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore /root/qatarionicapk/QatarCityApp.keystore ./platforms/android/app/build/outputs/apk/debug/app-debug.apk TrinityMobility'
 			 
-			 sh 'zipalign -v 4 ./app/build/outputs/apk/release/NGCADFRApp-release-unsigned.apk NGCADFRApp-release.apk'
+			 sh 'zipalign -v 4 ./platforms/android/app/build/outputs/apk/debug/app-debug.apk app-debug.apk'
             }
         
        stage ('Update Nexus Repo Latest Snapshot') {
 
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"release"+'.apk'
-              //finalOut = 'app/release/'+"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
-			  finalOut = ./"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"debug"+'.apk'
+              finalOut = './platforms/android/app/build/outputs/apk/debug/'+"$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
+			  //finalOut = "$BuildName"+'-'+"debug"+'.apk'+' '+"${nexustarget}"
               echo "${nexustarget}"
               echo "${finalOut}"
 
