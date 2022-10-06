@@ -1,0 +1,96 @@
+node ("$JenkinNodeID") {
+  try {
+        stage ('Code Checkout') {
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+		  stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+            sh '''npm install'''
+             }
+
+        stage ('Gradle Dependencies Installation') {
+            stageName = 'gradlew Dependencies Installation'
+             sh '''chmod +x gradlew &&\
+			      ./gradlew clean
+			 '''
+             }                                              
+
+        stage ('Complie, Build Client Libraries') {
+            stageName = 'Build Execution'
+             sh 'ionic cordova platform add android@10'
+             sh 'ionic cordova prepare android'
+			 sh 'ionic cordova build android –prod --release'
+			 sh 'echo -n "trinity@123" | jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore /root/qatarionicapk/QatarCityApp.keystore ./app/build/outputs/apk/release/NGCADFRApp-release-unsigned.apk TrinityMobility'
+			 
+			 sh 'zipalign -v 4 ./app/build/outputs/apk/release/NGCADFRApp-release-unsigned.apk NGCADFRApp-release.apk'
+            }
+        
+       stage ('Update Nexus Repo Latest Snapshot') {
+
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"$BuildName"+'-'+"release"+'.apk'
+              //finalOut = 'app/release/'+"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
+			  finalOut = ./"$BuildName"+'-'+"release"+'.apk'+' '+"${nexustarget}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+
+          sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+          }
+          currentBuild.result = 'SUCCESS'
+          }
+          catch (e) { 
+            currentBuild.result = 'FAILURE'
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+              /*  summarymsg = 'Application '+"${AppBuildName}"+' Build Failure in ' + "${stageName}" + ' Stage, Please take action Immediatly'
+                descriptionmsg = 'Build failure due to ' + "${Builderror}"+' Refer Jenkin Job'+"${env.JOB_NAME}"
+                echo "${Builderror}"
+                echo "${summarymsg}"
+                echo "${descriptionmsg}"
+                echo "${JIRAProjecKey}"
+                  def issue = [fields: [ project: [key: "${JIRAProjecKey}"],
+                      summary:  "${summarymsg}",
+                      description: "${descriptionmsg}",
+                      issuetype: [name: 'Bug'],
+                      assignee: [id: "${JiraDeveloperID}"]]]
+                  response = jiraNewIssue issue: issue, site: "${JiraSite}"
+                  echo response.successful.toString()
+                  echo response.data.toString()
+				  */
+				  }				  
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
