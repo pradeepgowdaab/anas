@@ -74,8 +74,9 @@ node ("$JenkinNodeID") {
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
             sh '''bash 
-				. ~/.nvm/nvm.sh && . ~/.profile && nvm use $nodejsVersion && \
-				cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				cd client && \
+				npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
                   npm install && npm run ng build "$ngBuildParam" && nvm use 10.16.2'''
              }
