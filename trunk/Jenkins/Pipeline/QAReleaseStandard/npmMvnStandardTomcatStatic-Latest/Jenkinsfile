@@ -73,7 +73,7 @@ node ("$JenkinNodeID") {
           
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''bash 
+            sh '''bash
 				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
 				cd client && \
 				npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
