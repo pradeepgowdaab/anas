@@ -54,7 +54,8 @@ stage ('Dependency check') {
                 --scan .
                 --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
                  }
-
+		echo"$isStaticAnalysisReq"
+        if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
