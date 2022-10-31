@@ -51,6 +51,8 @@ node ("$JenkinNodeID")
 				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
 				npm run ng build "$ngBuildParam"'''
             }
+			echo"$isStaticAnalysisReq"
+        if("$isStaticAnalysisReq" == 'true')
        stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
