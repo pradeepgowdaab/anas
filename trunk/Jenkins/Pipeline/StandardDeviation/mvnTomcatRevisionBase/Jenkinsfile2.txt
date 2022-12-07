@@ -100,7 +100,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh '. ~/.profile && mvn clean package -DskipTests=true $MvnGoal'
+            sh 'cd Server && . ~/.profile && mvn clean package -DskipTests=true' $MvnGoal'
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
@@ -187,7 +187,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh '. ~/.profile && mvn clean package -DskipTests=true'
+          sh 'cd Server && . ~/.profile && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
