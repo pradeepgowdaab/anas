@@ -96,7 +96,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging' 
-          sh 'mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')

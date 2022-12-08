@@ -38,12 +38,16 @@ node ("$JenkinNodeID")
          def workspace = env.WORKSPACE
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh 'npm install'
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				npm install'''
              }
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-            sh 'npm run ng build chatbot-lib'
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				npm run ng build chatbot-lib'''
             }
 				   echo"$isStaticCodeAnalysisReq"
         if("$isStaticCodeAnalysisReq" == 'true')

@@ -53,11 +53,7 @@ node ("$JenkinNodeID") {
 			sh'zip -r $BuildName.zip target/site/jacoco/'
             sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
-			stage ('Dependency check') {
-                dependencyCheck additionalArguments: '''--project $sonarprojectName
-                --scan .
-                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
-                 }
+
 		 stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
@@ -99,7 +95,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')

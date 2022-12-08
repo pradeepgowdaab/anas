@@ -72,7 +72,9 @@ node ("$JenkinNodeID") {
           }
              stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh ''' cd client && sudo n $nodejsVersion \
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				cd client && sudo n $nodejsVersion \
 				npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
   			  npm install --registry http://192.168.1.143:8081/repository/trinityTIDE-Library-npm/ tide@2.0.0 --save && \
                   npm install -D typescript && \
@@ -168,7 +170,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd Server && mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && cd Server && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')

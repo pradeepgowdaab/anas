@@ -73,8 +73,9 @@ node ("$JenkinNodeID") {
           
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh ''' sudo n $nodejsVersion && \
-			npm link @angular/cli && \
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+			    npm link @angular/cli && \
 			        npm install -D typescript && \
 			      cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && npm install --registry && \
 				  npm install --registry http://192.168.1.143:8081/repository/Trinity_npm/ sopexec@0.0.9 --save && \
@@ -170,7 +171,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd Server && mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && cd Server && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
