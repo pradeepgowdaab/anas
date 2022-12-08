@@ -73,7 +73,9 @@ node ("$JenkinNodeID") {
           
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh ''' npm install -g @angular/cli@12.1.3 && \
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				npm install -g @angular/cli@12.1.3 && \
 			       npm link @angular/cli && \
 			       ng version && \
 			      sudo n $nodejsVersion && \
@@ -168,7 +170,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd Server && mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && cd Server && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')

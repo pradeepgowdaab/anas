@@ -49,11 +49,7 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'mvn clean verify $MvnGoal'
             }
-stage ('Dependency check') {
-                dependencyCheck additionalArguments: '''--project $sonarprojectName
-                --scan .
-                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
-                 }
+
 		echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
@@ -97,7 +93,7 @@ stage ('Dependency check') {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')

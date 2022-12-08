@@ -73,7 +73,9 @@ node ("$JenkinNodeID") {
           
           stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-            sh '''cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+			    cd client && npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
                   npm install && npm run ng build "$ngBuildParam"'''
              }
@@ -113,11 +115,7 @@ node ("$JenkinNodeID") {
 			sh'cd Server && zip -r $BuildName.zip target/site/jacoco/'
             sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
             }
-			stage ('Dependency check') {
-                dependencyCheck additionalArguments: '''--project $sonarprojectName
-                --scan .
-                --format HTML --format XML --format JSON''', odcInstallation: 'Dependency_check'
-                 }
+
 			echo"$isStaticAnalysisReq"
         if("$isStaticAnalysisReq" == 'true')
        stage ('Static Code Analysisfor Client & Coverage Validation') {
@@ -184,7 +182,7 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd Server && mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && cd Server && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
@@ -315,7 +313,7 @@ node ("$JenkinNodeID") {
     {	
 	 stage ('DockerBuild') {
             stageName = 'Application Build Packaging'
-			  sh """cd Server && docker build \
+			  sh """export JAVA_HOME=/usr/share/java1.8 && cd Server && docker build \
 			        -t ${ImageNameLw.toLowerCase()} \
                     --no-cache ."""
              }	
