@@ -40,7 +40,9 @@ node ("$JenkinNodeID") {
 		  
         stage ('npm Dependencies Installation') {
             stageName = 'npm Dependencies Installation'
-             sh '''npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+             sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
                   npm install'''
              }
@@ -49,7 +51,9 @@ node ("$JenkinNodeID") {
 
         stage ('Complie, Build Client Libraries') {
             stageName = 'Build Execution'
-             sh 'npm run ng build "$ngBuildParam"'
+             sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				npm run ng build "$ngBuildParam"'''
             }
         stage ('Package Client Libraries') {
             stageName = 'Package Client Libraries'

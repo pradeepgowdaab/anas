@@ -44,9 +44,10 @@ node ("$JenkinNodeID") {
 	      sh(script: "svn info --show-item revision . > tmp_svn")
 		  sh(script: "echo '$SCM_checkout ' | rev | grep -Eo '[0-9]{4}+' | rev > tmp_sprint")
           def svnRevision = readFile('tmp_svn').trim()
-		  stage ('Application Build Packaging') {
+		  
+		stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh '''cd master && mvn clean install -Dmaven.test.skip=true && \
+          sh '''export JAVA_HOME=/usr/share/java1.8 && cd master && mvn clean install -Dmaven.test.skip=true && \
 		  cd .. && mvn clean install -Dmaven.test.skip=true'''
 		  
           }    
