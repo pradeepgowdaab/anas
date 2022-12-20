@@ -100,7 +100,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'cd Server && mvn clean verify $MvnGoal -DskipTests=true'
+            sh 'cd Server && mvn clean verify $MvnGoal'
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
@@ -144,7 +144,7 @@ node ("$JenkinNodeID") {
         stage ('Static Code Analysis for Server & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
-            sh '''cd ${WORKSPACE}/Server && mvn sonar:sonar -Dsonar.projectBaseDir=. \
+            sh '''cd ${WORKSPACE}/Server && mvn -DskipTests=true sonar:sonar -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectNameServer" \
             -Dsonar.projectName="$sonarprojectNameServer" \
             -Dsonar.host.url="$sonarhosturl" \
