@@ -100,7 +100,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'cd Server && mvn clean verify $MvnGoal'
+            sh 'cd Server && mvn clean verify $MvnGoal -DskipTests=true'
             }
 			echo"$isUnitTCaseEReportReq"
         if("$isUnitTCaseEReportReq" == 'true')
