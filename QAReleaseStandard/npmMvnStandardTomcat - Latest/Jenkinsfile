@@ -116,7 +116,7 @@ node ("$JenkinNodeID") {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
             sh '''bash
-				. ~/.nvm/nvm.sh && cd ${WORKSPACE}/client && npm install typescript && "$SonarScannerDir" -Dsonar.projectBaseDir=. \
+				. ~/.nvm/nvm.sh && . ~/.profile && cd ${WORKSPACE}/client && npm install typescript && "$SonarScannerDir" -Dsonar.projectBaseDir=. \
             -Dsonar.projectKey="$sonarprojectNameClient" \
             -Dsonar.projectName="$sonarprojectNameClient" \
             -Dsonar.host.url="$sonarhosturl" \
