@@ -1,0 +1,350 @@
+node ("$JenkinNodeID") {
+  try {
+       stage ('Server Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+         checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: 'Server',
+
+                  remote: '$SCM_checkout_Server']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+          stage ('Code Checkout Client') {
+          /* groovylint-disable-next-line TrailingComma */
+         checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: 'client',
+
+                  remote: '$SCM_checkout_Client']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+          
+          stage ('npm Dependencies Installation') {
+            stageName = 'npm Dependencies Installation'
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && \
+				cd client && \
+			npm install -g @angular/cli@12.1.3 && \
+			       npm link @angular/cli && \
+			       ng version && \
+			      npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
+                  npm install -D typescript && \
+                  npm install && npm run ng build "$ngBuildParam "'''
+             }
+          stage ('copying Client binaries to server ') {
+            stageName = 'npm Dependencies Installation'
+            sh '''rm -rf Server/src/main/resources/static/* && cp -r client/dist/$ClientBuildName/* Server/Main/src/main/resources/static/'''
+             }
+
+            def pom = readMavenPom file: "Server/Main/pom.xml"
+            def artifact = pom.getArtifactId()
+            def VERSION = pom.getVersion()
+            def packaging = pom.getPackaging()
+            def AppBuildName = "${artifact}"+"."+"${packaging}"
+            echo '$AppBuildName'
+			
+            echo"$isUnitTCaseEReq"
+            if("$isUnitTCaseEReq" == 'true')
+        stage ('Unit test Case Exec') {
+            stageName = 'Unit test Case Execution'
+            echo "${MvnGoal}"
+            sh 'cd Server && mvn clean verify $MvnGoal'
+            }
+			echo"$isUnitTCaseEReportReq"
+        if("$isUnitTCaseEReportReq" == 'true')
+        stage ('Unit test Case Report Exec') {
+            stageName = 'Unit test Case ReportExecution'
+			sh'cd Server && zip -r $BuildName.zip Main/target/site/jacoco/'
+            sh 'cd Server && curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
+            }
+		echo"$isStaticAnalysisReq"
+        if("$isStaticAnalysisReq" == 'true')
+       stage ('Static Code Analysisfor Client & Coverage Validation') {
+            stageName = 'Static Code Analysis'
+            withSonarQubeEnv('sonar') {
+            sh '''bash
+				. ~/.nvm/nvm.sh && . ~/.profile && nvm install $nodejsVersion && cd ${WORKSPACE}/client && npm install typescript && "$SonarScannerDir" -Dsonar.projectBaseDir=. \
+            -Dsonar.projectKey="$sonarprojectNameClient" \
+            -Dsonar.projectName="$sonarprojectNameClient" \
+            -Dsonar.host.url="$sonarhosturl" \
+            -Dsonar.login="$sonarlogin" \
+            -Dsonar.password="$sonarpassword" \
+            -Dsonar.scm.enabled=true \
+            -Dsonar.scm.provider=svn \
+            -Dsonar.svn.username="$sonarsvnusername" \
+            -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+            -Dsonar.exclusions="$sonarexclusionsClient" \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.jacoco.reportPath=target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
+          }
+          }
+		  echo"$isStaticAnalysisReq"
+        if("$isStaticAnalysisReq" == 'true')
+        stage ('Static Code Analysis for Server & Coverage Validation') {
+            stageName = 'Static Code Analysis'
+            withSonarQubeEnv('sonar') {
+            sh '''cd ${WORKSPACE}/Server && mvn clean verify -DskipTests=true && mvn sonar:sonar -Dsonar.projectBaseDir=. \
+            -Dsonar.projectKey="$sonarprojectNameServer" \
+            -Dsonar.projectName="$sonarprojectNameServer" \
+            -Dsonar.host.url="$sonarhosturl" \
+            -Dsonar.login="$sonarlogin" \
+            -Dsonar.password="$sonarpassword" \
+            -Dsonar.scm.enabled=true \
+            -Dsonar.scm.provider=svn \
+            -Dsonar.svn.username="$sonarsvnusername" \
+            -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+            -Dsonar.exclusions="$sonarexclusionsServer" \
+			-Dsonar.test.exclusions="$sonarexclusionsServer" \
+            -Dsonar.java.binaries=Main/target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.jacoco.reportPath=target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''	
+          }
+          }
+	 echo"$isQGValidationReq"
+        if("$isQGValidationReq" == 'true')	  
+      stage ('Quality Gate Validation') {
+          stageName = 'Quality Gate'
+          def qg = waitForQualityGate()
+          timeout(time: 1, unit: 'HOURS') {
+            echo '$qg'
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+        }
+
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'cd Server && mvn clean package -DskipTests=true'
+          }
+        echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+        {
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
+          url: "$tomcatUrl")],
+          contextPath: "$contextPath",
+          war: '**/*.war'
+        }
+        }
+		echo"$isTestJoBTriggerReq"
+        if("$isTestJoBTriggerReq" == 'true')
+		stage ('Build TestAutomation JOB') {
+          stageName = 'Build TestAutomation JOB'
+          build 'Automation'
+          }
+		  echo"$isTestingReq"
+        if("$isTestingReq" == 'true')
+		stage ('Intiate TestAutomation') {
+          stageName = 'Intiate TestAutomation'
+          sh '''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll}" -e async_Result="${async_Result}" -e poll_Result="${poll_Result}" -e Nexusurl="${NexusUrl}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Project_Build="${Project_Build}" -e SpID="${SpID}" -e NexusRepoID="${NexusRepoID}" -e Env="${Env}" -vvvv'''
+          }
+		echo"$isZaPTestReqWithLogin"
+        if("$isZaPTestReqWithLogin" == 'true')
+		stage ('Intiate Zaptesting') {
+          stageName = 'Intiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py \
+                    -z "auth.loginurl=$Applicat_authloginurl \
+                    auth.username="$Application_authusername" auth.password="$Application_authpassword" auth.auto=1" || error=true '''
+          }
+		  echo"$isZaPTestReqWithoutLogin"
+        if("$isZaPTestReqWithoutLogin" == 'true')
+		stage ('Initiate Zaptesting') {
+          stageName = 'Initiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
+          }
+		  echo"$isReqCodeCoverageWindows"
+        if("$isReqCodeCoverageWindows" == 'true')
+		stage ('Initiate CodeCoverage') {
+          stageName = 'Initiate CodeCoverage'
+          sh '''/usr/bin/ansible-playbook -i $hostspathCodeCoverageReport $ansibleplaybookCodeCoverageReport --e TargetMachine="${WCoverageTargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e drive="${drive}" -e Codecoverage="${Codecoverage}" -e zip="${zip}" -e Service="${Service}" -e TomcatPath="${TomcatPath}" -e Nexusurl="${NexusUrl}" -e NexusRepoID="${NexusRepoID}" -e Product="${BuildName}" -e NexusUser="${NexusUserID}" -e Password="${NexusUserPass}" -e Env="${Env}" -e BuildName="${BuildName}" -e ModeofOperation="${ModeofOperation}" -vvvv'''
+          }
+		  
+		 echo"$isReqCodeCoverageUbuntuWithTomcatDir"
+        if("$isReqCodeCoverageUbuntuWithTomcatDir" == 'true')
+		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "chmod -R 777 $ubuntucoberturaPath/$zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/shutdown.sh"'''
+		 sh'''sleep 1m'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "$ubuntucoberturaPath/$zip/cobertura-report.sh --format html --datafile $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/cobertura.ser --destination $ubuntucoberturaPath/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
+		sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
+            }
+			echo"$isReqCodeCoverageUbuntuWithUserDir"
+        if("$isReqCodeCoverageUbuntuWithUserDir" == 'true')
+		  stage('CodeCoverage') {
+		  sh'export ANSIBLE_HOST_KEY_CHECKING=False'
+          sh'''/usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -u $NexusUserID:$NexusUserPass http://$NexusUrl/repository/Continuous_Integration/AutomationTesting/$zip.zip  -o $ubuntucoberturaPath/$zip.zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "unzip  -o $ubuntucoberturaPath/$zip.zip -d /opt/"'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "chmod -R 777 $ubuntucoberturaPath/$zip"'''
+		  sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/shutdown.sh"'''
+		 sh'''sleep 1m'''
+		 sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "$ubuntucoberturaPath/$zip/cobertura-report.sh --format html --datafile $coberturaUserDir/cobertura.ser --destination $ubuntucoberturaPath/$zip/$BuildName-Coverage [JAVA-SOURCE]"'''
+		 sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "zip -r $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip $ubuntucoberturaPath/$zip/$BuildName-Coverage"'''
+		sh'''
+        /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "curl -v -u $NexusUserID:$NexusUserPass --upload-file $ubuntucoberturaPath/$zip/$BuildName-Coverage.zip http://$NexusUrl/repository/$NexusRepoID/$Env/$ModeofOperation/$BuildName/$BuildName.zip"'''
+		sh'''
+         /usr/bin/sshpass -p "$remotepassword" ssh $remoteuser@$remotehost "sh $ubuntucoberturaPath/$UbuntuTomcatFolder/bin/catalina.sh start"'''
+            }
+		if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+              if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+              else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/stable/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'Server/target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+          }
+              }
+	if("$isDockerBuildReq" == 'true')
+    {	
+	 stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+			  sh """cd Server && docker build \
+			        -t ${ImageNameLw.toLowerCase()} \
+                    --no-cache ."""
+             }	
+}			 
+		if("$isDockerPushReq" == 'true')
+		{
+		  stage ('DockerPush') {
+			  stageName = 'Application Build Packaging'
+			  sh """cd Server && docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+			  }
+				
+          }
+          currentBuild.result = 'SUCCESS'
+		 stage ('Report success Status into JIRA'){
+		  sh '''
+		  export ANSIBLE_HOST_KEY_CHECKING=False
+		  cd $Notification_Script 
+			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
+		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+          }
+		  }
+          catch (e) { 
+            currentBuild.result = 'FAILURE' 
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+			  sh '''
+			  export ANSIBLE_HOST_KEY_CHECKING=False
+			  cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+            
+              }
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
