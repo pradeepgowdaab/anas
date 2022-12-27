@@ -46,7 +46,7 @@ node ("$JenkinNodeID") {
     def svnRevision = readFile('tmp_svn').trim()
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh '/usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true -Dspotbugs.skip=true -Dcheckstyle.skip -Dfindbugs.skip=true'
+          sh 'mvn clean install -Dmaven.test.skip=true -Dspotbugs.skip=true -Dcheckstyle.skip -Dfindbugs.skip=true'
           }
 
         stage ('Update Nexus Repo Latest Snapshot') {
