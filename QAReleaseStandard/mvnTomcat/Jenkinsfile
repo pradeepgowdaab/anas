@@ -47,7 +47,7 @@ node ("$JenkinNodeID") {
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'mvn clean verify $MvnGoal'
+            sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean verify $MvnGoal'
             }
 			
           if("$isStaticAnalysisReq" == 'true')
