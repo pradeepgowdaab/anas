@@ -49,8 +49,8 @@ node ("$JenkinNodeID") {
 		  
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'cd $BuildName && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true'
-          sh "cd ${CAPath} && /usr/lib/maven354/bin/mvn clean install -Dmaven.test.skip=true"
+          sh 'cd $BuildName && . ~/.profile && mvn clean install -Dmaven.test.skip=true'
+          sh "cd ${CAPath} && . ~/.profile && mvn clean install -Dmaven.test.skip=true"
           }
 
         stage ('Update Nexus Repo Latest Snapshot') {
