@@ -57,7 +57,7 @@ node ("$JenkinNodeID") {
             }
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh '/usr/lib/maven354/bin/mvn clean install'
+          sh ' export JAVA_HOME=/usr/share/java1.8 && mvn clean install'
           }
 
           stage ('Static Code Analysis & Coverage Validation') {
