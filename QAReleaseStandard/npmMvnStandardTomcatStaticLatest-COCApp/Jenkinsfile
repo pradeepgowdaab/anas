@@ -81,6 +81,7 @@ node ("$JenkinNodeID") {
 			       ng version && \
 			      npm update "$npmBuildParam" && npm install "$npmBuildParam" && \
                   npm install -D typescript && \
+				  npm install --registry http://192.168.1.143:8081/repository/trinityTIDE-Library-npm/ tide@2.0.0 --save
                   npm install && npm run ng build "$ngBuildParam "'''
              }
           stage ('copying Client binaries to server ') {
