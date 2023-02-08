@@ -151,24 +151,13 @@ node ("$JenkinNodeID")
         }
           currentBuild.result = 'SUCCESS'
 		 stage ('Report success Status into JIRA'){
-		  sh '''
-		  export ANSIBLE_HOST_KEY_CHECKING=False
-		  cd $Notification_Script 
-			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
-		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
-			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
-                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
-                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+         cleanWs()
           }
 		  }
           catch (e) { 
             currentBuild.result = 'FAILURE' 
               Builderror = "${e}"
               stage ('Report Error Status into JIRA') {
-			  sh '''
-			  export ANSIBLE_HOST_KEY_CHECKING=False
-			  cd $Notification_Script 
-				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
             
               }
             }
