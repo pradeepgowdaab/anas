@@ -127,10 +127,10 @@ node ("$JenkinNodeID") {
             -Dsonar.svn.username="$sonarsvnusername" \
             -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
             -Dsonar.exclusions="$sonarexclusionsClient" \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.java.binaries=Main/target/classes \
+            -Dsonar.junit.reportsPath=Main/target/surefire-reports \
+            -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml \
             -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
             -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
             -Dsonar.dependencyCheck.securityHotspot=true \
@@ -157,9 +157,9 @@ node ("$JenkinNodeID") {
             -Dsonar.exclusions="$sonarexclusionsServer" \
 			-Dsonar.test.exclusions="$sonarexclusionsServer" \
             -Dsonar.java.binaries=Main/target/classes \
-            -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml \
+            -Dsonar.junit.reportsPath=Main/target/surefire-reports \
+            -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
+            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml \
             -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
             -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
             -Dsonar.dependencyCheck.securityHotspot=true \
