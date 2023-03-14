@@ -159,7 +159,6 @@ node ("$JenkinNodeID") {
             -Dsonar.java.binaries=Main/target/classes \
             -Dsonar.junit.reportsPath=Main/target/surefire-reports \
             -Dsonar.jacoco.reportPath=Main/target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=Main/target/site/jacoco/jacoco.xml \
 			-Dsonar.coverage.jacoco.xmlReportPaths=Main/target/site/jacoco/jacoco.xml \
             -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
             -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
