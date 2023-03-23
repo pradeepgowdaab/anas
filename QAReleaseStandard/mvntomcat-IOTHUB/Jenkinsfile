@@ -1,0 +1,217 @@
+node ("$JenkinNodeID") {
+  try {
+        stage ('Code Checkout') {
+          /* groovylint-disable-next-line TrailingComma */
+          checkout([
+             $class: 'SubversionSCM',
+
+              additionalCredentials: [],
+
+              excludedCommitMessages: '',
+
+              excludedRegions: '',
+
+              excludedRevprop: '',
+
+              excludedUsers: '',
+
+              filterChangelog: false,
+
+              ignoreDirPropChanges: false,
+
+              includedRegions: '',
+
+                locations: [[cancelProcessOnExternalsFail: true,
+
+                  credentialsId: "$SCM_Cred_ID",
+
+                  depthOption: 'infinity',
+
+                  ignoreExternalsOption: true,
+
+                  local: '.',
+
+                  remote: '$SCM_checkout']],
+
+                quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
+          }
+          def  artifact = readMavenPom().getArtifactId()
+          def    VERSION = readMavenPom().getVersion()
+          def   packaging = readMavenPom().getPackaging()
+          def    AppBuildName = "${artifact}"+"."+"${packaging}"
+		  def ImageName = "${artifact}"+":"+"latest"
+          def BuildName = "${artifact}"
+          echo "$BuildName"
+       	 echo"$isUnitTCaseEReq"
+        if("$isUnitTCaseEReq" == 'true')
+        stage ('Unit test Case Exec') {
+            stageName = 'Unit test Case Execution'
+            echo "${MvnGoal}"
+            sh 'export JAVA_HOME=/usr/share/java1.8 && mvn $MvnGoal clean verify $MvnGoal'
+            }
+			
+			echo"$isUnitTCaseEReportReq"
+        if("$isUnitTCaseEReportReq" == 'true')
+        stage ('Unit test Case Report Exec') {
+            stageName = 'Unit test Case ReportExecution'
+			sh'zip -r $BuildName.zip target/site/jacoco/'
+            sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
+            }
+			
+          if("$isStaticAnalysisReq" == 'true')
+        stage ('Static Code Analysis & Coverage Validation') {
+            stageName = 'Static Code Analysis'
+            withSonarQubeEnv('sonar') {
+            sh '''mvn sonar:sonar -Dsonar.projectBaseDir=. \
+            -Dsonar.projectKey="$sonarprojectName" \
+            -Dsonar.projectName="$sonarprojectName" \
+            -Dsonar.host.url="$sonarhosturl" \
+            -Dsonar.login="$sonarlogin" \
+            -Dsonar.password="$sonarpassword" \
+            -Dsonar.scm.enabled=true \
+            -Dsonar.scm.provider=svn \
+            -Dsonar.svn.username="$sonarsvnusername" \
+            -Dsonar.svn.password.secured="$sonarsvnpasswordsecured" \
+            -Dsonar.exclusions="$sonarexclusions" \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportsPath=target/surefire-reports \
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
+          }
+          }
+	 echo"$isQGValidationReq"
+        if("$isQGValidationReq" == 'true')	  
+      stage ('Quality Gate Validation') {
+          stageName = 'Quality Gate'
+          def qg = waitForQualityGate()
+          timeout(time: 1, unit: 'HOURS') {
+            echo '$qg'
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+              }
+          }
+        }
+
+        stage ('Application Build Packaging') {
+          stageName = 'Application Build Packaging'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean package -DskipTests=true'
+          }
+        echo"$isDeploymentReq"
+        if("$isDeploymentReq" == 'true')
+        {
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
+          url: "$tomcatUrl")],
+          contextPath: "$contextPath",
+          war: '**/*.war'
+        }
+        }
+		echo"$isTestJoBTriggerReq"
+        if("$isTestJoBTriggerReq" == 'true')
+		stage ('Build TestAutomation JOB') {
+          stageName = 'Build TestAutomation JOB'
+          build 'Automation'
+          }
+		  echo"$isTestingReq"
+        if("$isTestingReq" == 'true')
+		stage ('Intiate TestAutomation') {
+          stageName = 'Intiate TestAutomation'
+          sh '''
+			/usr/bin/ansible-playbook -i $hostspath $ansibleplaybook --e TargetMachine="${TargetMachine}" -e ansible_user="${ansible_user}" -e ansible_password="${ansible_password}" -e Param_config="${Param_config}" -e Param_XVaultToken="${Param_XVaultToken}" -e token="${token}" -e vault_conf="${vault_conf}" -e drive="${drive}" -e testAutomationFramework_Directory="${testAutomationFramework_Directory}" -e Projectcode="${Projectcode}" -e ProjectPlanecode="${ProjectPlanecode}" -e TESTLINK_API_PYTHON_SERVER_URL="${TESTLINK_API_PYTHON_SERVER_URL}" -e TESTLINK_API_PYTHON_DEVKEY="${TESTLINK_API_PYTHON_DEVKEY}" -e jar="${jar}" -e async="${async}" -e poll="${poll} -e Nexusurl="${TestReportNexusurl} -e Product="${Product} -e NexusUser="${NexusUser} -e Password="${Password}" -e Project_Build="${Project_Build}" -vvvv'''
+          }
+		echo"$isZaPTestReqWithLogin"
+        if("$isZaPTestReqWithLogin" == 'true')
+		stage ('Intiate Zaptesting') {
+          stageName = 'Intiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py \
+                    -z "auth.loginurl=$Applicat_authloginurl \
+                    auth.username="$Application_authusername" auth.password="$Application_authpassword" auth.auto=1" || error=true '''
+          }
+		  echo"$isZaPTestReqWithoutLogin"
+        if("$isZaPTestReqWithoutLogin" == 'true')
+		stage ('Initiate Zaptesting') {
+          stageName = 'Initiate Zaptesting'
+          sh ''' mkdir -p out && \
+                    chmod -R 777 out && \
+                    docker run -v $(pwd)/out:/zap/wrk/:rw -t owasp/zap2docker-stable \
+                    zap-baseline.py -t $Application_BaseUrl \
+                    -g gen.conf -d -r zap_scan_report.html --hook=/zap/auth_hook.py || error=true '''
+          }
+        if("$NexusRepoReq" == 'true')
+              {
+        stage ('Update Nexus Repo Latest Snapshot') {
+              if("$BuildWithVerNo" == 'true')
+              {
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+              else
+              {
+              AppBuildName = "${artifact}"+'.'+"${packaging}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
+              echo "${AppBuildName}"
+              echo "${nexustarget}"
+              echo "${finalOut}"
+              sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file '+"${finalOut}"
+              }
+          }
+              }
+          if("$isDockerBuildReq" == 'true')
+           {
+            stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+            sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 &&
+			docker build \
+            -t ${BuildName.toLowerCase()} \
+            --no-cache ."""
+            }
+           }
+          if("$isDockerPushReq" == 'true')
+           {
+             stage ('DockerPush') {
+             stageName = 'Application Build Packaging'
+             sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+            }
+          }
+          currentBuild.result = 'SUCCESS'
+		 stage ('Report success Status into JIRA'){
+		  sh '''
+		  export ANSIBLE_HOST_KEY_CHECKING=False
+		  cd $Notification_Script 
+			/usr/bin/ansible-playbook -i hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${EmailSubject}" -e body="${Emailmessagebody}" -vvvv'''
+		    sh 'curl -v -u $Nexus_Username:$Nexus_Password --upload-file $Zap_Output $Zap_Nexus_Url || error=true'
+			sh '''curl -u admin:TrInItY123 http://192.168.1.143:8081/repository/HKPFSAF/Dev/Automation/sonar-cnes-report-3.2.2.jar -o sonar-cnes-report-3.2.2.jar
+                  java -jar $ReportJAR -t $SonarSecID -s $SonarQubeUrl -p $SonarProjectID -r $SonarProjectID.docx 
+                  curl -v -u admin:TrInItY123 --upload-file *.docx http://$NexusHost/repository/$ProjectID/Dev/StaticAnalysis/$SonarProjectID.docx'''
+          }
+		  }
+          catch (e) { 
+            currentBuild.result = 'FAILURE' 
+              Builderror = "${e}"
+              stage ('Report Error Status into JIRA') {
+			  sh '''
+			  export ANSIBLE_HOST_KEY_CHECKING=False
+			  cd $Notification_Script 
+				/usr/bin/ansible-playbook -i fail-hosts site.yml --e smtphost="${smtphost}" -e smtpport="${smtpport}" -e smtpUser="${smtpUser}" -e smtpPass="${smtpPass}" -e to="${API_To}" -e cc="${API_CC}" -e subject="${Fail_EmailSubject}" -e body="${Fail_Emailmessagebody}" -vvvv'''
+            
+              }
+            }
+              stage ('Finishing: Sitback and Relax')
+              {
+              cleanWs() 
+              }
+              }
