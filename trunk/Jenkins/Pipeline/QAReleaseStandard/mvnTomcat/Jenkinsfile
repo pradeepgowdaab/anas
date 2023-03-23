@@ -49,6 +49,13 @@ node ("$JenkinNodeID") {
             echo "${MvnGoal}"
             sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean verify $MvnGoal'
             }
+			echo"$isUnitTCaseEReportReq"
+        if("$isUnitTCaseEReportReq" == 'true')
+        stage ('Unit test Case Report Exec') {
+            stageName = 'Unit test Case ReportExecution'
+			sh'zip -r $BuildName.zip target/site/jacoco/'
+            sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
+            }
 			
           if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
