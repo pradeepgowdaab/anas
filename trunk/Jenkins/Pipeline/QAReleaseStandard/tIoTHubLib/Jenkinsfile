@@ -35,30 +35,22 @@ node ("$JenkinNodeID") {
 
                 quietOperation: true, workspaceUpdater: [$class: 'CheckoutUpdater']])
           }
-		  def  artifact = readMavenPom().getArtifactId()
+          def  artifact = readMavenPom().getArtifactId()
           def    VERSION = readMavenPom().getVersion()
           def   packaging = readMavenPom().getPackaging()
-          def    AppBuildName = "${artifact}"+"-"+"${VERSION}"+"."+"${packaging}"
-		  
+          def    AppBuildName = "${artifact}"+"."+"${packaging}"
 		  def ImageName = "${artifact}"+":"+"latest"
-          def ImageNameLw = "${artifact}"
-          echo "$ImageNameLw"
+          def BuildName = "${artifact}"
+          echo "$BuildName"
        	 echo"$isUnitTCaseEReq"
         if("$isUnitTCaseEReq" == 'true')
         stage ('Unit test Case Exec') {
             stageName = 'Unit test Case Execution'
             echo "${MvnGoal}"
-            sh 'mvn clean verify $MvnGoal'
+            sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean verify $MvnGoal'
             }
-			echo"$isUnitTCaseEReportReq"
-        if("$isUnitTCaseEReportReq" == 'true')
-        stage ('Unit test Case Report Exec') {
-            stageName = 'Unit test Case ReportExecution'
-			sh'zip -r $BuildName.zip target/site/jacoco/'
-            sh 'curl -v -u "$NexusUserID":"$NexusUserPass" --upload-file $BuildName.zip http://$NexusHost/repository/$ProjectID/QA/UnitTestingCoverageReport/$BuildName.zip'
-            }
-           echo"$isStaticAnalysisReq"
-        if("$isStaticAnalysisReq" == 'true')
+			
+          if("$isStaticAnalysisReq" == 'true')
         stage ('Static Code Analysis & Coverage Validation') {
             stageName = 'Static Code Analysis'
             withSonarQubeEnv('sonar') {
@@ -75,8 +67,12 @@ node ("$JenkinNodeID") {
             -Dsonar.exclusions="$sonarexclusions" \
             -Dsonar.java.binaries=target/classes \
             -Dsonar.junit.reportsPath=target/surefire-reports \
-            -Dsonar.jacoco.reportPath=target/jacoco.exec \
-            -Dsonar.cobertura.reportPath=target/site/jacoco/jacoco.xml'''
+            -Dsonar.dependencyCheck.xmlReportPath=dependency-check-report.xml \
+            -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json \
+            -Dsonar.dependencyCheck.securityHotspot=true \
+            -Dsonar.dependencyCheck.summarize=true \
+            -Dsonar.dependencyCheck.skip=false \
+            -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html'''
           }
           }
 	 echo"$isQGValidationReq"
@@ -94,17 +90,17 @@ node ("$JenkinNodeID") {
 
         stage ('Application Build Packaging') {
           stageName = 'Application Build Packaging'
-          sh 'mvn clean package -DskipTests=true'
+          sh 'export JAVA_HOME=/usr/share/java1.8 && mvn clean package -DskipTests=true'
           }
         echo"$isDeploymentReq"
         if("$isDeploymentReq" == 'true')
         {
-         stage('Deployment to QA Environment'){
-         stage='Deployment to QA Environment'     
-		sh ''' mkdir target2 && \
-		 find -iname '*.jar' -exec cp {} target2/ \\; '''
-		sh '''
-		sshpass  -p "$remotepassword" scp -r -o StrictHostKeyChecking=no "target2/$BuildName-jar-with-dependencies.jar"  "$remoteuser@$remotehost:$tomcatDir/"'''
+        stage ('Deployment to QA Environment') {
+          stageName = 'Deployment to QA Environment'
+          deploy adapters: [tomcat8(credentialsId: "$tomcatToken",
+          url: "$tomcatUrl")],
+          contextPath: "$contextPath",
+          war: '**/*.war'
         }
         }
 		echo"$isTestJoBTriggerReq"
@@ -147,7 +143,7 @@ node ("$JenkinNodeID") {
         stage ('Update Nexus Repo Latest Snapshot') {
               if("$BuildWithVerNo" == 'true')
               {
-              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${AppBuildName}"
+              nexustarget = 'http://'+"$NexusUrl"+'/repository/'+"$NexusRepoID"+'/QA/latest/'+"$Artifact_Product"+'/'+"${VERSION}"+'/'+"${AppBuildName}"
               finalOut = 'target/'+"${AppBuildName}"+' '+"${nexustarget}"
               echo "${AppBuildName}"
               echo "${nexustarget}"
@@ -166,23 +162,23 @@ node ("$JenkinNodeID") {
               }
           }
               }
-			  echo "$ImageName"
-             if("$isDockerBuildReq" == 'true')
-                 {
-                      stage ('DockerBuild') {
-                      stageName = 'Application Build Packaging'
-                      sh """docker build \
-                      -t ${ImageNameLw.toLowerCase()} \
-                      --no-cache ."""
-                   }
-                }
-              if("$isDockerPushReq" == 'true')
-            {
-               stage ('DockerPush') {
-               stageName = 'Application Build Packaging'
-               sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${ImageNameLw.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${ImageNameLw.toLowerCase()}:$VERSION"""
+          if("$isDockerBuildReq" == 'true')
+           {
+            stage ('DockerBuild') {
+            stageName = 'Application Build Packaging'
+            sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 &&
+			docker build \
+            -t ${BuildName.toLowerCase()} \
+            --no-cache ."""
+            }
            }
-           }
+          if("$isDockerPushReq" == 'true')
+           {
+             stage ('DockerPush') {
+             stageName = 'Application Build Packaging'
+             sh """docker login -u $NexusUserID -p $NexusUserPass repo.trinityiot.in:8123 && docker tag ${BuildName.toLowerCase()} repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION && docker push repo.trinityiot.in:8123/${NexusRepoID.toLowerCase()}/${Artifact_Product.toLowerCase()}/${BuildName.toLowerCase()}:$VERSION"""
+            }
+          }
           currentBuild.result = 'SUCCESS'
 		 stage ('Report success Status into JIRA'){
 		  sh '''
