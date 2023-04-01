@@ -89,7 +89,7 @@ node ("$JenkinNodeID") {
             sh '''rm -rf Server/src/main/resources/static/* && cp -r client/dist/$ClientBuildName/* Server/Main/src/main/resources/static/'''
              }
 
-            def pom = readMavenPom file: "Server/Main/pom.xml"
+            def pom = readMavenPom file: "Server/pom.xml"
             def artifact = pom.getArtifactId()
             def VERSION = pom.getVersion()
             def packaging = pom.getPackaging()
